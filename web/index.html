@@ -47,11 +47,15 @@
     </div>
     <div class="row">
         <div class="col-md-12 col-lg-6">
-            <label class="form-label" for="input">Input data</label>
+            <label class="form-label" for="input">Input data or select from the dropdown</label>
+			<br>
+			<select id="profiles"></select>
             <textarea class="form-control" id="input" rows="20" style="font-family: monospace"></textarea>
         </div>
         <div class="col-md-12 col-lg-6">
             <label class="form-label" for="output">Resulting YAML</label>
+			<br>
+			<br>
             <textarea class="form-control" id="output" rows="20" style="font-family: monospace"></textarea>
         </div>
         <div class="col-sm-12" style="text-align: center">
@@ -71,9 +75,40 @@
 </div>
 
 <script>
+	$.getJSON("https://tuya-cloudcutter.github.io/api/devices.json", function (data) {
+		$.each(data, function (index, value) {
+			$("#profiles").append($("<option>", {
+				value: value.slug,
+				text: value.manufacturer + ' - ' + value.name
+			}));
+		});
+		var options = $("#profiles option");
+		options.detach().sort(function(a,b) {
+			var at = $(a).text().toLowerCase();
+			var bt = $(b).text().toLowerCase();         
+			return (at > bt)?1:((at < bt)?-1:0);
+		});
+		
+		$("#profiles").append($("<option>", {
+			value: 0,
+			text: "Select profile"
+		}));
+		options.appendTo("#profiles");  
+		$("#profiles")[0].selectedIndex = 0;
+		
+	});
+	
+	$("#profiles").on("change", function() {	
+		$.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + this.value + ".json", function (data) {
+			console.log(data);
+			$("#input").val(JSON.stringify(data, undefined, 2));
+		});
+	});
+	  
     $("#run").on("click", function () {
         pyscript.interpreter.globals.get("on_run_click")();
     });
+	
 </script>
 <script crossorigin="anonymous"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
