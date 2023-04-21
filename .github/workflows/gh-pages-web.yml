@@ -24,7 +24,7 @@ jobs:
         run: |
           poetry build
           cp dist/*.whl web/
-          mv web/*.whl web/upk2esphome-0.1.0-py3-none-any.whl
+          mv -f web/*.whl web/upk2esphome-0.1.0-py3-none-any.whl
 
 #      - name: Publish to PyPI
 #        run: poetry publish -u __token__ -p ${{ secrets.PYPI_TOKEN }}
