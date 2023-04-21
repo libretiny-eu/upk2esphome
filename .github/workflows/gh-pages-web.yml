@@ -6,6 +6,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     name: Deploy website to GitHub Pages
