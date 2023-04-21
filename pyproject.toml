@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "upk2esphome"
+version = "0.1.0"
+description = "Convert Tuya device configuration to ESPHome YAML"
+authors = ["Kuba Szczodrzyński <kuba@szczodrzynski.pl>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+PyYAML = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+autoflake = "^2.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

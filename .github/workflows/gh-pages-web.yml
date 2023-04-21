@@ -1,0 +1,37 @@
+name: Deploy website to GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy website to GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install poetry
+        uses: Gr1N/setup-poetry@v7
+
+      - name: Build package
+        run: |
+          poetry build
+          cp dist/*.whl web/
+          mv web/*.whl web/upk2esphome-0.1.0-py3-none-any.whl
+
+#      - name: Publish to PyPI
+#        run: poetry publish -u __token__ -p ${{ secrets.PYPI_TOKEN }}
+
+      - name: Deploy API to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: web/
+          target-folder: /
+          force: true
