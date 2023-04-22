@@ -91,7 +91,7 @@
             }));
         });
         var options = $("#profiles option");
-        options.detach().sort(function(a,b) {
+        options.detach().sort(function (a, b) {
             var at = $(a).text().toLowerCase();
             var bt = $(b).text().toLowerCase();         
             return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
@@ -117,6 +117,7 @@
     });
       
     $("#run").on("click", function () {
+        $("#output").val("");
         pyscript.interpreter.globals.get("on_run_click")();
     });
     
