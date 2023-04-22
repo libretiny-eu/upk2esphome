@@ -1,10 +1,11 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
 from upk2esphome.generator import invert
+from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
 
-def generate(yr: YamlResult, config: dict):
+def generate(yr: YamlResult, config: dict, opts: Opts):
     keys = [
         "bt1_pin",
         "bt2_pin",
@@ -33,6 +34,7 @@ def generate(yr: YamlResult, config: dict):
             continue
 
         yr.log(f" - relay {i}: pin P{rl_pin}")
+        yr.found = True
         switch = {
             "platform": "gpio",
             "id": f"switch_{i}",
@@ -42,6 +44,7 @@ def generate(yr: YamlResult, config: dict):
         invert(switch, rl_inv)
         if led_pin is not None:
             yr.log(f" - LED {i}: pin P{led_pin}")
+            yr.found = True
             output = {
                 "platform": "ledc",
                 "id": f"output_led_{i}",
@@ -63,6 +66,7 @@ def generate(yr: YamlResult, config: dict):
             ]
         if bt_pin is not None:
             yr.log(f" - button {i}: pin P{bt_pin}")
+            yr.found = True
             binary = {
                 "platform": "gpio",
                 "id": f"binary_switch_{i}",
@@ -82,6 +86,7 @@ def generate(yr: YamlResult, config: dict):
     bt_inv = config.get(f"total_bt_lv", None) == 0
     if bt_pin is not None:
         yr.log(f" - all-toggle button: pin P{bt_pin}")
+        yr.found = True
         binary = {
             "platform": "gpio",
             "id": f"binary_switch_all",

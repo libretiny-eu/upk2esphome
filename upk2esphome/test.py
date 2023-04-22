@@ -5,13 +5,15 @@ if __name__ == "__main__":
     from os.path import dirname, join
 
     from .generator import generate_yaml
+    from .opts import Opts
 
     for file in glob(join(dirname(__file__), "tests", "*.txt")):
         with open(file, "r") as f:
             d = f.read().strip()
         print(file)
-        yr = generate_yaml(d)
+        yr = generate_yaml(d, Opts())
         print("\n".join(yr.logs))
         print("\n".join(yr.warnings))
+        print("\n".join(yr.errors))
         print(yr.text)
         print("-" * 80)

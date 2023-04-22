@@ -32,9 +32,19 @@ def parse_input(data: str) -> dict:
 
     if "device_configuration" in value:
         value = value["device_configuration"]
+    elif "schemas" in value:
+        raise ValueError(
+            "The specified Cloudcutter JSON doesn't contain device configuration"
+        )
+
     if "user_param_key" in value:
         value = value["user_param_key"]
-    if "Jsonver" in value or "jv" in value:
+    elif "gw_bi" in value:
+        raise ValueError(
+            "The specified storage JSON doesn't contain device configuration"
+        )
+
+    if "Jsonver" in value or "jv" in value or "crc" in value:
         value = dict(sorted(value.items()))
         return value
 

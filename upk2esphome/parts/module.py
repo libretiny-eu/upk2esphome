@@ -1,23 +1,26 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
+from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
 
-def generate(yr: YamlResult, config: dict):
+def generate(yr: YamlResult, config: dict, opts: Opts):
     if "module" in config:
         module = config["module"]
     else:
         yr.warn("No module type found! You have to set the board: manually")
-        yr.data["esphome"] = {
-            "name": "UPK2ESPHome",
-            "name_add_mac_suffix": True,
-        }
-        yr.data["libretuya"] = {
-            "board": "FIX_ME",
-            "framework": {
-                "version": "dev",
-            },
-        }
+        if opts.esphome_block:
+            yr.data["esphome"] = {
+                "name": "UPK2ESPHome",
+            }
+            if opts.name_mac:
+                yr.data["esphome"]["name_add_mac_suffix"] = True
+            yr.data["libretuya"] = {
+                "board": "FIX_ME",
+                "framework": {
+                    "version": "dev",
+                },
+            }
         return
 
     match module[0:2].upper():
@@ -31,13 +34,15 @@ def generate(yr: YamlResult, config: dict):
 
     yr.log(f"Found {module} config!")
 
-    yr.data["esphome"] = {
-        "name": config["module"],
-        "name_add_mac_suffix": True,
-    }
-    yr.data["libretuya"] = {
-        "board": board,
-        "framework": {
-            "version": "dev",
-        },
-    }
+    if opts.esphome_block:
+        yr.data["esphome"] = {
+            "name": config["module"],
+        }
+        if opts.name_mac:
+            yr.data["esphome"]["name_add_mac_suffix"] = True
+        yr.data["libretuya"] = {
+            "board": board,
+            "framework": {
+                "version": "dev",
+            },
+        }

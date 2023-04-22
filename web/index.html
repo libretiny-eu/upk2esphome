@@ -34,7 +34,7 @@
                 href="https://github.com/tuya-cloudcutter/bk7231tools">bk7231tools</a>
         </li>
         <li><code>user_param_key</code> JSON (just the object)</li>
-        <li>raw data (JSON-like) extracted from storage, or offset 0x1E5000 of the flash memory</li>
+        <li>raw data (JSON-like) extracted from storage, or offset 0x1E5000/0x1D4000 of the flash memory</li>
     </ul>
     <p>Supported device features are: relays, buttons, LEDs (status, PWM, driver chips), power monitoring chips.</p>
     <div class="alert alert-warning" role="alert">
@@ -45,22 +45,64 @@
             before uploading it to the device.</p>
         <p><b>We do not take responsibility for using this tool and the generated configs.</b></p>
     </div>
+    <div class="col-sm-12" id="warnings"></div>
     <div class="row">
-        <div class="col-md-12 col-lg-6">
-            <label class="form-label" for="input">Input data or select from the dropdown:</label>
-            <br>
-            <select id="profiles" class="form-select"></select>
-        </div>
-        <div class="col-md-12 col-lg-6 align-self-center">
-            <label class="form-label" for="output">Resulting YAML:</label>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12 col-lg-6">
+        <div class="col-sm-12 col-md-8 col-lg-4 col-xl-4 col-xxl-4">
+            <label class="form-label" for="profiles">Choose a predefined profile:</label>
+            <select class="form-select" id="profiles"></select>
+            <label class="form-label" for="input">Input data</label>
             <textarea class="form-control" id="input" rows="20" style="font-family: monospace"></textarea>
         </div>
-        <div class="col-md-12 col-lg-6">
-            <textarea class="form-control" id="output" rows="20" style="font-family: monospace"></textarea>
+        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="options">
+            <p>Conversion options</p>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_esphome_block" type="checkbox" value="">
+                <label class="form-check-label" for="opts_esphome_block">Include <code>esphome:</code> block</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_name_mac" type="checkbox" value="">
+                <label class="form-check-label" for="opts_name_mac">Add MAC to device name</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_common" type="checkbox" value="">
+                <label class="form-check-label" for="opts_common">Add common components</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_web_server" type="checkbox" value="">
+                <label class="form-check-label" for="opts_web_server">Add Web Server and Captive Portal</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_restart" type="checkbox" value="">
+                <label class="form-check-label" for="opts_restart">Add restart button & sensor</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_uptime" type="checkbox" value="">
+                <label class="form-check-label" for="opts_uptime">Add uptime sensor</label>
+            </div>
+            <div class="form-check">
+                <input checked class="form-check-input" id="opts_lt_version" type="checkbox" value="">
+                <label class="form-check-label" for="opts_lt_version">Add LT version sensor</label>
+            </div>
+            <div class="mt-3">
+                <label class="form-label" for="opts_wifi_ssid">Wi-Fi SSID</label>
+                <input class="form-control" id="opts_wifi_ssid" type="text" value="!secret wifi_ssid">
+            </div>
+            <div class="mt-3">
+                <label class="form-label" for="opts_wifi_password">Wi-Fi password</label>
+                <input class="form-control" id="opts_wifi_password" type="text" value="!secret wifi_password">
+            </div>
+            <div class="mt-3">
+                <label class="form-label" for="opts_ota_password">OTA password</label>
+                <input class="form-control" id="opts_ota_password" type="text" value="!secret ota_password">
+            </div>
+            <div class="mt-3">
+                <label class="form-label" for="opts_api_password">API password</label>
+                <input class="form-control" id="opts_api_password" type="text" value="!secret api_password">
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-6">
+            <label class="form-label" for="output">Resulting YAML:</label>
+            <textarea class="form-control" id="output" rows="23" readonly style="font-family: monospace"></textarea>
         </div>
     </div>
     <div class="row">
@@ -68,7 +110,6 @@
             <button class="btn btn-primary mt-3" id="run" type="button">Generate YAML</button>
         </div>
         <div class="col-sm-12" id="logs"></div>
-        <div class="col-sm-12" id="warnings"></div>
         <footer class="py-3 my-4 border-top">
             <p class="col-md-4 mb-0 text-body-secondary mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
                 &copy; 2023 kuba2k2 &amp;
@@ -91,39 +132,61 @@
         var options = $("#profiles option");
         options.detach().sort(function (a, b) {
             var at = $(a).text().toLowerCase();
-            var bt = $(b).text().toLowerCase();         
+            var bt = $(b).text().toLowerCase();
             return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
         });
-        
         $("#profiles").append($("<option>", {
             value: 0,
             text: "Select profile"
         }));
-        options.appendTo("#profiles");  
+        options.appendTo("#profiles");
         $("#profiles")[0].selectedIndex = 0;
-        
     });
-    
-    $("#profiles").on("change", function() {  
-        if (this.value == 0) {
+
+    $("#profiles").on("change", function () {
+        if (this.value === 0) {
             $("#warnings").empty();
             $("#logs").empty();
             $("#input").val("");
             $("#output").val("");
-        }  else {
+        } else {
             $.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + this.value + ".json", function (data) {
-                $("#input").val(JSON.stringify(data, undefined, 2));
+                data = JSON.stringify(data, undefined, 2)
+                $("#input").val(data);
+                localStorage.setItem("input", data);
+                $("#run").click();
             });
         }
     });
-      
+
+    $("input, textarea").on("change", function () {
+        const el = $(this)[0];
+        if (el.type === "text" || el.tagName === "TEXTAREA") {
+            localStorage.setItem(el.id, el.value);
+        } else if (el.type === "checkbox") {
+            localStorage.setItem(el.id, el.checked);
+        }
+        $("#run").click();
+    });
+
+    $(document).ready(function() {
+        $("input, textarea").each(function () {
+            const el = $(this)[0];
+            const value = localStorage.getItem(el.id);
+            if (!value)
+                return;
+            if (el.type === "text" || el.tagName === "TEXTAREA") {
+                el.value = value;
+            } else if (el.type === "checkbox") {
+                el.checked = value === "true";
+            }
+        });
+    });
+
     $("#run").on("click", function () {
-        $("#warnings").empty();
-        $("#logs").empty();
-        $("#output").val("");
         pyscript.interpreter.globals.get("on_run_click")();
     });
-    
+
 </script>
 <script crossorigin="anonymous"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"

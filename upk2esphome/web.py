@@ -2,23 +2,30 @@
 
 from js import jQuery
 
-from upk2esphome import generate_yaml, parse_input
+from upk2esphome import Opts, generate_yaml
 
 
 def on_run_click():
-    data = jQuery("#input").val()
-    try:
-        config = parse_input(data)
-    except Exception as e:
-        jQuery("#warnings").html(
-            f'<div class="alert alert-danger" role="alert">{e}</div>'
-        )
-        return
-    yr = generate_yaml(config)
+    opts = {}
+    options = jQuery("#options input")
+    for i in range(options.length):
+        el = options[i]
+        el_id = el.id
+        if not el_id.startswith("opts_"):
+            continue
+        el_value = el.value if el.type == "text" else el.checked
+        opts[el_id[5:]] = el_value
+    opts = Opts(**opts)
+
+    config = jQuery("#input").val()
+    yr = generate_yaml(config, opts)
     jQuery("#output").val(yr.text)
     jQuery("#logs").html("<pre>" + "<br>".join(yr.logs) + "</pre>")
     jQuery("#warnings").html(
         "".join(
+            f'<div class="alert alert-danger" role="alert">{e}</div>' for e in yr.errors
+        )
+        + "".join(
             f'<div class="alert alert-warning" role="alert">{w}</div>'
             for w in yr.warnings
         )

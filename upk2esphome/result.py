@@ -6,18 +6,25 @@ class YamlResult:
     text: str
     logs: list[str]
     warnings: list[str]
+    errors: list[str]
+    found: bool
 
     def __init__(self):
         self.data = {}
         self.text = ""
         self.logs = []
         self.warnings = []
+        self.errors = []
+        self.found = False
 
     def log(self, text: str):
         self.logs.append(text)
 
     def warn(self, text: str):
         self.warnings.append(text)
+
+    def error(self, text: str):
+        self.errors.append(text)
 
     def component(self, data: dict):
         if "external_components" not in self.data:
@@ -48,3 +55,13 @@ class YamlResult:
         if "sensor" not in self.data:
             self.data["sensor"] = []
         self.data["sensor"].append(data)
+
+    def text_sensor(self, data: dict):
+        if "text_sensor" not in self.data:
+            self.data["text_sensor"] = []
+        self.data["text_sensor"].append(data)
+
+    def button(self, data: dict):
+        if "button" not in self.data:
+            self.data["button"] = []
+        self.data["button"].append(data)

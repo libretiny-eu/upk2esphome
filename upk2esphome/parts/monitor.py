@@ -1,10 +1,11 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
 from upk2esphome.generator import invert
+from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
 
-def generate(yr: YamlResult, config: dict):
+def generate(yr: YamlResult, config: dict, opts: Opts):
     keys = [
         "chip_type",
         "over_cur",
@@ -38,6 +39,7 @@ def generate(yr: YamlResult, config: dict):
                 f"Power monitoring chip {chip}: "
                 f"CF=P{ele_pin}, CF1=P{vi_pin}, SEL={sel_pin}"
             )
+            yr.found = True
             sensor = {
                 "platform": "hlw8012",
                 "model": chip,
@@ -65,6 +67,7 @@ def generate(yr: YamlResult, config: dict):
             tx_pin = f"P{tx_pin}" if tx_pin else "TX1"
             chip = "BL0942"
             yr.log(f"Power monitoring chip {chip}: " f"RX={rx_pin}, TX={tx_pin}")
+            yr.found = True
             uart = {
                 "id": "uart_bus",
                 "tx_pin": tx_pin,

@@ -1,6 +1,7 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
 from upk2esphome.generator import invert
+from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
 colors = ["red", "green", "blue", "cold", "warm"]
@@ -231,7 +232,7 @@ def gen_i2c_bp1658cj(yr: YamlResult, config: dict):
     return found
 
 
-def generate(yr: YamlResult, config: dict):
+def generate(yr: YamlResult, config: dict, opts: Opts):
     # remove duplicate channels
     if config.get("iicc", None) == config.get("iicw", None):
         config.pop("iicw", None)
@@ -248,6 +249,7 @@ def generate(yr: YamlResult, config: dict):
         if not any(key in config for key in keys):
             continue
         yr.log(f"{name} bulb")
+        yr.found = True
         # find colors
         found = func(yr, config)
         if not found:
