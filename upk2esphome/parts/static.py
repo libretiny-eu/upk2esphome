@@ -8,8 +8,8 @@ def generate(yr: YamlResult, config: dict):
     yr.data["web_server"] = {}
     yr.data["captive_portal"] = {}
     yr.data["mdns"] = {}
-    yr.data["api"] = {"password": ""}
-    yr.data["ota"] = {"password": ""}
+    yr.data["api"] = {"password": "!secret api_password"}
+    yr.data["ota"] = {"password": "!secret ota_password"}
     yr.data["wifi"] = {
         "ssid": "!secret wifi_ssid",
         "password": "!secret wifi_password",
