@@ -7,7 +7,17 @@ def generate(yr: YamlResult, config: dict):
     if "module" in config:
         module = config["module"]
     else:
-        yr.warn("No module type found! You have to add the libretuya: block manually")
+        yr.warn("No module type found! You have to set the board: manually")
+        yr.data["esphome"] = {
+            "name": "UPK2ESPHome",
+            "name_add_mac_suffix": True,
+        }
+        yr.data["libretuya"] = {
+            "board": "FIX_ME",
+            "framework": {
+                "version": "dev",
+            },
+        }
         return
 
     match module[0:2].upper():
@@ -23,6 +33,7 @@ def generate(yr: YamlResult, config: dict):
 
     yr.data["esphome"] = {
         "name": config["module"],
+        "name_add_mac_suffix": True,
     }
     yr.data["libretuya"] = {
         "board": board,
