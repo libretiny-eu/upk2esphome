@@ -124,14 +124,21 @@ def gen_i2c_sm2135eh(yr: YamlResult, config: dict):
         "data_pin": f"P{sda}",
     }
 
-    cur_color = config.get("ehccur", None)
-    cur_white = config.get("ehwcur", None)
+    cur_color = config.get("ehccur", config.get("iicccur", None))
+    cur_white = config.get("ehwcur", config.get("iicwcur", None))
     if cur_color is not None:
         cur_color = 10 + cur_color * 5
+    else:
+        cur_color = config.get("campere", None)
+    if cur_white is not None:
+        cur_white = 10 + cur_white * 5
+    else:
+        cur_white = config.get("wampere", None)
+
+    if cur_color is not None:
         yr.data["sm2135"]["rgb_current"] = f"{cur_color}mA"
         yr.log(f" - color channels current: {cur_color} mA")
     if cur_white is not None:
-        cur_white = 10 + cur_white * 5
         yr.data["sm2135"]["cw_current"] = f"{cur_white}mA"
         yr.log(f" - white channels current: {cur_white} mA")
 
@@ -240,10 +247,12 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
     chips = {
         "PWM": (gen_pwm, ["r_pin", "g_pin", "b_pin", "c_pin", "w_pin"]),
         "SM2235": (gen_i2c_sm2235, ["2235ccur", "2235wcur"]),
-        "SM2135EH": (gen_i2c_sm2135eh, ["ehccur", "ehwcur"]),
+        "SM2135EH": (
+            gen_i2c_sm2135eh,
+            ["ehccur", "ehwcur", "wampere", "campere", "iicccur", "iicwcur"],
+        ),
         "BP5758D": (gen_i2c_bp5758d, ["dccur", "dwcur", "drgbcur"]),
         "BP1658CJ": (gen_i2c_bp1658cj, ["cjccur", "cjwcur"]),
-        "UNKNOWN": (None, ["iicccur", "iicwcur"]),
     }
     for name, (func, keys) in chips.items():
         if not any(key in config for key in keys):
