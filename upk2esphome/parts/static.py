@@ -45,7 +45,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
     if opts.lt_version:
         yr.text_sensor(
             {
-                "platform": "libretuya",
-                "version": {"name": "LibreTuya Version"},
+                "platform": "libretiny",
+                "version": {"name": "LibreTiny Version"},
             }
         )
