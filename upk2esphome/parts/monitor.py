@@ -55,6 +55,8 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
                 yr.log(f" - shunt resistor: {resistor} mΩ")
                 sensor["current_resistor"] = f"{resistor/1000:.03f} ohm"
             invert(sensor, sel_inv, "sel_pin")
+            invert(sensor, chip_type == 0, "cf_pin")
+            invert(sensor, chip_type == 0, "cf1_pin")
             yr.sensor(sensor)
 
         case 2:  # HLW8032
