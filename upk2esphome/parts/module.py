@@ -11,7 +11,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
         yr.warn("No module type found! You have to set the board: manually")
         if opts.esphome_block:
             yr.data["esphome"] = {
-                "name": "UPK2ESPHome",
+                "name": "upk2esphome",
             }
             if opts.name_mac:
                 yr.data["esphome"]["name_add_mac_suffix"] = True
@@ -36,7 +36,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
 
     if opts.esphome_block:
         yr.data["esphome"] = {
-            "name": config["module"],
+            "name": config["module"].lower(),
         }
         if opts.name_mac:
             yr.data["esphome"]["name_add_mac_suffix"] = True
