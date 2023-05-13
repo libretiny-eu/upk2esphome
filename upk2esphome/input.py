@@ -2,6 +2,7 @@
 
 import json
 import re
+from typing import Union
 
 
 def parse_user_param_key(value: str) -> dict | None:
@@ -12,11 +13,13 @@ def parse_user_param_key(value: str) -> dict | None:
     return value
 
 
-def parse_input(data: str) -> dict:
-    data = data.strip()
+def parse_input(data: Union[str, dict]) -> dict:
+    if isinstance(data, str):
+        data = data.strip()
     loaders = [
         json.loads,
         parse_user_param_key,
+        dict,
     ]
 
     value: dict | None = None
