@@ -17,6 +17,20 @@ def invert(data: dict, inverted: bool, key: str = "pin"):
         }
 
 
+def pull(data: dict, inverted: bool, key: str = "pin"):
+    if inverted:
+        data[key] = {
+            "number": data[key],
+            "inverted": True,
+            "mode": "INPUT_PULLUP",
+        }
+    else:
+        data[key] = {
+            "number": data[key],
+            "mode": "INPUT_PULLDOWN",
+        }
+
+
 def generate_yaml(config: str, opts: Opts) -> YamlResult:
     from .parts import bulb, module, monitor, netled, static, switch
 

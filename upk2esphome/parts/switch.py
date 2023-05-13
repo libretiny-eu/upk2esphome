@@ -1,6 +1,6 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
-from upk2esphome.generator import invert
+from upk2esphome.generator import invert, pull
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
@@ -77,7 +77,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
                     ],
                 },
             }
-            invert(binary, bt_inv)
+            pull(binary, bt_inv)
             yr.binary(binary)
         switches.append(switch["id"])
         yr.switch(switch)
@@ -93,7 +93,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             "pin": f"P{bt_pin}",
             "on_press": {"then": []},
         }
-        invert(binary, bt_inv)
+        pull(binary, bt_inv)
         for switch in switches:
             binary["on_press"]["then"].append({"switch.toggle": switch})
         yr.binary(binary)
