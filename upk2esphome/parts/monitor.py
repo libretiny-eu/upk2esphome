@@ -37,7 +37,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             chip = "BL0937" if chip_type == 0 else "HLW8012"
             yr.log(
                 f"Power monitoring chip {chip}: "
-                f"CF=P{ele_pin}, CF1=P{vi_pin}, SEL={sel_pin}"
+                f"CF/ELE=P{ele_pin}, CF1/VI=P{vi_pin}, SEL={sel_pin}"
             )
             yr.found = True
             sensor = {
@@ -50,6 +50,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
                 "voltage": {"name": f"{chip} Voltage"},
                 "power": {"name": f"{chip} Power"},
                 "energy": {"name": f"{chip} Energy"},
+                "voltage_divider": 1600,
             }
             if resistor is not None:
                 yr.log(f" - shunt resistor: {resistor} mΩ")
