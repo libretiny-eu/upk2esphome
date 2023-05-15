@@ -16,7 +16,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             if opts.name_mac:
                 yr.data["esphome"]["name_add_mac_suffix"] = True
             yr.data["libretiny"] = {
-                "board": "FIX_ME",
+                "board": "REPLACEME",
                 "framework": {
                     "version": "dev",
                 },
