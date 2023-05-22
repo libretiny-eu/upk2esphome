@@ -191,7 +191,7 @@ def gen_i2c_bp5758d(yr: YamlResult, config: dict):
         output = {
             "platform": "bp5758d",
             "id": f"output_{color}",
-            "channel": config[channel],
+            "channel": config[channel] + 1,
         }
         if current:
             output["current"] = current
