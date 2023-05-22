@@ -178,7 +178,7 @@ class UpkPanel(BasePanel):
             on_storage=self.OnStorageData,
             on_error=self.OnStorageError,
         )
-        self.StartWork(work, freeze_ui=True)
+        self.StartWork(work)
 
     @on_event
     def OnDoKickstartClick(self):
@@ -203,7 +203,7 @@ class UpkPanel(BasePanel):
             on_storage=self.OnStorageData,
             on_error=self.OnStorageError,
         )
-        self.StartWork(work, freeze_ui=True)
+        self.StartWork(work)
 
     @on_event
     def OnDoCloudcutterClick(self):
@@ -292,7 +292,7 @@ class UpkPanel(BasePanel):
                 on_storage=self.OnStorageData,
                 on_error=self.OnStorageError,
             )
-            self.StartWork(work, freeze_ui=True)
+            self.StartWork(work)
 
     @on_event
     def OnGenerateClick(self):
