@@ -6,11 +6,11 @@ from dataclasses import dataclass
 @dataclass
 class Opts:
     esphome_block: bool = True
-    name_mac: bool = True
+    name_mac: bool = False
     common: bool = True
     web_server: bool = True
-    restart: bool = True
-    uptime: bool = True
+    restart: bool = False
+    uptime: bool = False
     lt_version: bool = True
     wifi_ssid: str = ""
     wifi_password: str = ""
