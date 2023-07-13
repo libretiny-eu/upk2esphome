@@ -45,6 +45,16 @@
             before uploading it to the device.</p>
         <p><b>We do not take responsibility for using this tool and the generated configs.</b></p>
     </div>
+    <div class="alert alert-info" role="alert">
+        <p><b>
+            Download <a href="https://docs.libretiny.eu/docs/flashing/tools/ltchiptool/">ltchiptool</a>
+            for the best experience!
+        </b></p>
+        <p>
+            Includes grabbing UPK data directly from
+            <a href="https://github.com/libretiny-eu/esphome-kickstart">ESPHome-Kickstart</a>.
+        </p>
+    </div>
     <div class="col-sm-12" id="warnings"></div>
     <div class="row">
         <div class="col-sm-12 col-md-8 col-lg-4 col-xl-4 col-xxl-4">
@@ -102,7 +112,7 @@
         </div>
         <div class="col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-6">
             <label class="form-label" for="output">Resulting YAML:</label>
-            <textarea class="form-control" id="output" rows="23" readonly style="font-family: monospace"></textarea>
+            <textarea class="form-control" id="output" readonly rows="23" style="font-family: monospace"></textarea>
         </div>
     </div>
     <div class="row">
@@ -169,7 +179,7 @@
         $("#run").click();
     });
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("input, textarea").each(function () {
             const el = $(this)[0];
             const value = localStorage.getItem(el.id);
