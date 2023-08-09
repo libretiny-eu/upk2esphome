@@ -60,6 +60,8 @@
         <div class="col-sm-12 col-md-8 col-lg-4 col-xl-4 col-xxl-4">
             <label class="form-label" for="profiles">Choose a predefined profile:</label>
             <select class="form-select" id="profiles"></select>
+            <label class="form-label" for="profileUrl">Profile URL:</label>
+            <input class="form-control" type="text" id="profileUrl" readonly />
             <label class="form-label" for="input">Input data</label>
             <textarea class="form-control" id="input" rows="20" style="font-family: monospace"></textarea>
         </div>
@@ -151,6 +153,15 @@
         }));
         options.appendTo("#profiles");
         $("#profiles")[0].selectedIndex = 0;
+        var querystrings = new URLSearchParams(window.location.search);
+        var profile = querystrings.get('profile');
+        if (profile != null) {
+            var option = $("#profiles option[value='" + profile + "']");
+            if (option != null) {
+                option.prop('selected', true);
+                options.trigger('change');
+            }
+        }
     });
 
     $("#profiles").on("change", function () {
@@ -159,11 +170,14 @@
             $("#logs").empty();
             $("#input").val("");
             $("#output").val("");
+            $("profileUrl").val("");
         } else {
             $.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + this.value + ".json", function (data) {
+                slug = data.slug;
                 data = JSON.stringify(data, undefined, 2)
                 $("#input").val(data);
                 localStorage.setItem("input", data);
+                $("#profileUrl").val(document.location + "?profile=" + slug);
                 $("#run").click();
             });
         }
