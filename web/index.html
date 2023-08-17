@@ -153,11 +153,11 @@
         }));
         options.appendTo("#profiles");
         $("#profiles")[0].selectedIndex = 0;
-        var querystrings = new URLSearchParams(window.location.search);
-        var profile = querystrings.get('profile');
-        if (profile != null) {
-            var option = $("#profiles option[value='" + profile + "']");
-            if (option != null) {
+        const query = new URLSearchParams(window.location.search);
+        const profile = query.get('profile');
+        if (profile) {
+            const option = $(`#profiles option[value='${profile}']`);
+            if (option.length) {
                 option.prop('selected', true);
                 options.trigger('change');
             }
