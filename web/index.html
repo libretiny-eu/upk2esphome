@@ -170,14 +170,14 @@
             $("#logs").empty();
             $("#input").val("");
             $("#output").val("");
-            $("profileUrl").val("");
+            $("#profileUrl").val("");
         } else {
             $.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + this.value + ".json", function (data) {
-                slug = data.slug;
+                const slug = data.slug;
                 data = JSON.stringify(data, undefined, 2)
                 $("#input").val(data);
                 localStorage.setItem("input", data);
-                $("#profileUrl").val(document.location + "?profile=" + slug);
+                $("#profileUrl").val(document.location.origin + document.location.pathname + "?profile=" + slug);
                 $("#run").click();
             });
         }
