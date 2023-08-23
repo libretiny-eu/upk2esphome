@@ -57,7 +57,7 @@ def gen_pwm(yr: YamlResult, config: dict) -> set[str]:
 
         yr.log(f" - color {color}: pin P{pin}, inverted {inv}")
         output = {
-            "platform": "ledc",
+            "platform": "libretiny_pwm",
             "id": f"output_{color}",
             "pin": f"P{pin}",
         }

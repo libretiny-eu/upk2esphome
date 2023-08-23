@@ -46,7 +46,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             yr.log(f" - LED {i}: pin P{led_pin}")
             yr.found = True
             output = {
-                "platform": "ledc",
+                "platform": "libretiny_pwm",
                 "id": f"output_led_{i}",
                 "pin": f"P{led_pin}",
             }
