@@ -17,6 +17,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
         "rl3_pin",
         "rl4_pin",
         "rl_type",
+        "onoff1",
     ]
     if not any(key in config for key in keys):
         return
@@ -30,6 +31,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
         led_inv = config.get(f"led{i}_lv", None) == 0
         bt_pin = config.get(f"bt{i}_pin", None)
         bt_inv = config.get(f"bt{i}_lv", None) == 0
+        onoff_pin = config.get(f"onoff{i}", None)
         if rl_pin is None:
             continue
 
@@ -42,9 +44,9 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             "pin": f"P{rl_pin}",
         }
         invert(switch, rl_inv)
+
         if led_pin is not None:
             yr.log(f" - LED {i}: pin P{led_pin}")
-            yr.found = True
             output = {
                 "platform": "ledc",
                 "id": f"output_led_{i}",
@@ -64,9 +66,9 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             switch["on_turn_off"] = [
                 {"light.turn_off": light["id"]},
             ]
+
         if bt_pin is not None:
             yr.log(f" - button {i}: pin P{bt_pin}")
-            yr.found = True
             binary = {
                 "platform": "gpio",
                 "id": f"binary_switch_{i}",
@@ -79,6 +81,22 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             }
             pull(binary, bt_inv)
             yr.binary(binary)
+
+        if onoff_pin is not None:
+            yr.log(f" - ON/OFF switch {i}: pin P{onoff_pin}")
+            binary = {
+                "platform": "gpio",
+                "id": f"binary_onoff_{i}",
+                "pin": f"P{onoff_pin}",
+                "on_state": {
+                    "then": [
+                        {"switch.toggle": switch["id"]},
+                    ],
+                },
+            }
+            pull(binary, inverted=True)
+            yr.binary(binary)
+
         switches.append(switch["id"])
         yr.switch(switch)
 
