@@ -23,6 +23,8 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
         return
     yr.log("Switch/plug config")
 
+    netled_reuse = config.get("netled_reuse", None) == 1
+
     switches = []
     for i in range(0, 10):
         rl_pin = config.get(f"rl{i}_pin", None)
@@ -65,6 +67,14 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             ]
             switch["on_turn_off"] = [
                 {"light.turn_off": light["id"]},
+            ]
+        elif netled_reuse:
+            yr.log(f" - LED {i}: (shared)")
+            switch["on_turn_on"] = [
+                {"light.turn_on": "light_status"},
+            ]
+            switch["on_turn_off"] = [
+                {"light.turn_off": "light_status"},
             ]
 
         if bt_pin is not None:
