@@ -1,22 +1,17 @@
-name: Deploy website to GitHub Pages
-
+name: Push (master)
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - master
-
-permissions:
-  contents: write
-
+    branches: ["master"]
 jobs:
-  deploy:
-    name: Deploy website to GitHub Pages
+  deploy-pages:
+    name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -28,12 +23,8 @@ jobs:
           poetry build
           cp dist/*.whl web/
           mv web/*.whl web/upk2esphome.whl
-          mv web/*.whl web/upk2esphome-0.1.0-py3-none-any.whl
 
-#      - name: Publish to PyPI
-#        run: poetry publish -u __token__ -p ${{ secrets.PYPI_TOKEN }}
-
-      - name: Deploy API to GitHub Pages
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: web/
