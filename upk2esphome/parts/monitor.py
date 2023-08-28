@@ -37,7 +37,7 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             chip = "BL0937" if chip_type == 0 else "HLW8012"
             yr.log(
                 f"Power monitoring chip {chip}: "
-                f"CF/ELE=P{ele_pin}, CF1/VI=P{vi_pin}, SEL={sel_pin}"
+                f"CF/ELE=P{ele_pin}, CF1/VI=P{vi_pin}, SEL=P{sel_pin}"
             )
             yr.found = True
             sensor = {

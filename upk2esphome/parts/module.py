@@ -17,9 +17,6 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
                 yr.data["esphome"]["name_add_mac_suffix"] = True
             yr.data["bk72xx"] = {
                 "board": "REPLACEME",
-                "framework": {
-                    "version": "dev",
-                },
             }
         return
 
@@ -42,7 +39,4 @@ def generate(yr: YamlResult, config: dict, opts: Opts):
             yr.data["esphome"]["name_add_mac_suffix"] = True
         yr.data["bk72xx"] = {
             "board": board,
-            "framework": {
-                "version": "dev",
-            },
         }

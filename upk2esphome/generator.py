@@ -1,6 +1,7 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
 import re
+from typing import Union
 
 import yaml
 
@@ -31,7 +32,7 @@ def pull(data: dict, inverted: bool, key: str = "pin"):
         }
 
 
-def generate_yaml(config: str, opts: Opts) -> YamlResult:
+def generate_yaml(config: Union[str, dict], opts: Opts) -> YamlResult:
     from .parts import bulb, module, monitor, netled, static, switch
 
     parts = [module, static, bulb, switch, netled, monitor]
@@ -53,7 +54,11 @@ def generate_yaml(config: str, opts: Opts) -> YamlResult:
             "thermometers, water leak sensors, or fan controllers."
         )
 
-    yr.text = yaml.dump(yr.data, sort_keys=False)
+    class MyDumper(yaml.Dumper):
+        def increase_indent(self, flow=False, **_):
+            return super(MyDumper, self).increase_indent(flow, False)
+
+    yr.text = yaml.dump(yr.data, sort_keys=False, Dumper=MyDumper)
     yr.text = re.sub(r"'!secret ([\w_]+)'", r"!secret \1", yr.text)
     yr.text = re.sub(r"\n([a-z])", r"\n\n\1", yr.text)
     yr.text = yr.text.replace("'", '"')
