@@ -5,7 +5,6 @@ import os
 from logging import debug, error, info, warning
 from os.path import dirname, isfile
 
-import requests
 import wx
 import wx.adv
 import wx.xrc
@@ -15,6 +14,7 @@ from ltchiptool.util.logging import LoggingHandler
 
 from upk2esphome import Opts, generate_yaml
 
+from .common import cloudcutter_get_device, cloudcutter_list_devices
 from .work import UpkThread
 
 DISCLAIMER_TEXT = """
@@ -206,32 +206,12 @@ class UpkPanel(BasePanel):
     def OnDoCloudcutterClick(self):
         self.DisableAll()
         try:
-            url = "https://tuya-cloudcutter.github.io/api/devices.json"
-            with requests.get(url) as r:
-                if r.status_code != 200:
-                    self.EnableAll()
-                    wx.MessageBox(
-                        message=(
-                            "Couldn't download Cloudcutter device list.\n"
-                            f"Status code: {r.status_code}"
-                        ),
-                        caption="Error",
-                        style=wx.ICON_ERROR,
-                    )
-                    return
-                devices = r.json()
+            devices_slug, devices_name = cloudcutter_list_devices()
+            self.EnableAll()
         except Exception as e:
             self.EnableAll()
             LoggingHandler.get().emit_exception(e)
             return
-        self.EnableAll()
-
-        for device in devices:
-            device["name"] = f'{device["manufacturer"]} - {device["name"]}'
-        devices = sorted(devices, key=lambda d: d["name"])
-
-        devices_slug = [device["slug"] for device in devices]
-        devices_name = [device["name"] for device in devices]
 
         dialog = wx.SingleChoiceDialog(
             self,
@@ -245,30 +225,14 @@ class UpkPanel(BasePanel):
         selection = dialog.GetSelection()
         dialog.Destroy()
 
-        slug = devices_slug[selection]
-        debug(f"Selection: {slug}")
-
         self.DisableAll()
         try:
-            url = f"https://tuya-cloudcutter.github.io/api/devices/{slug}.json"
-            with requests.get(url) as r:
-                if r.status_code != 200:
-                    self.EnableAll()
-                    wx.MessageBox(
-                        message=(
-                            f"Couldn't download Cloudcutter device '{slug}'.\n"
-                            f"Status code: {r.status_code}"
-                        ),
-                        caption="Error",
-                        style=wx.ICON_ERROR,
-                    )
-                    return
-                device = r.json()
+            device = cloudcutter_get_device(devices_slug[selection])
+            self.EnableAll()
         except Exception as e:
             self.EnableAll()
             LoggingHandler.get().emit_exception(e)
             return
-        self.EnableAll()
 
         self.storage = None
         self.upk = device.get("device_configuration", {})

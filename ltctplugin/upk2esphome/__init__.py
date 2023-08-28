@@ -12,14 +12,18 @@ class Plugin(PluginBase):
 
     @property
     def has_cli(self) -> bool:
-        return False
+        return True
 
     @property
     def has_gui(self) -> bool:
         return True
 
     def build_cli(self, *args, **kwargs) -> Dict[str, Any]:
-        return dict()
+        from .cli import cli
+
+        return dict(
+            upk2esphome=cli,
+        )
 
     def build_gui(self, *args, **kwargs) -> Dict[str, Any]:
         from .gui import UpkPanel
