@@ -13,6 +13,8 @@ from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event
 from ltchiptool.util.logging import LoggingHandler
 
+from upk2esphome import Opts, generate_yaml
+
 from .work import UpkThread
 
 DISCLAIMER_TEXT = """
@@ -66,6 +68,16 @@ class UpkPanel(BasePanel):
 
         self.EnableFileDrop()
 
+        default_opts = Opts()
+        for key, value in Opts.FLAGS.items():
+            if key not in self.Opts:
+                continue
+            self.Opts[key].SetValue(getattr(default_opts, key))
+        for key, value in Opts.INPUTS.items():
+            if key not in self.Opts:
+                continue
+            self.Opts[key].ChangeValue(getattr(default_opts, key))
+
     def GetSettings(self) -> dict:
         return dict(
             opts={key: value.GetValue() for key, value in self.Opts.items()},
@@ -112,21 +124,6 @@ class UpkPanel(BasePanel):
                 style=wx.ICON_WARNING,
             )
             self.disclaimer_shown = True
-
-        try:
-            import upk2esphome
-        except (ImportError, ModuleNotFoundError):
-            wx.MessageBox(
-                message=(
-                    "upk2esphome package is not installed. Install it using:\n\n"
-                    "pip install upk2esphome"
-                ),
-                caption="Error",
-                style=wx.ICON_ERROR,
-            )
-            return
-
-        from upk2esphome import Opts, generate_yaml
 
         opts = Opts(**self.GetSettings()["opts"])
         yr = generate_yaml(upk, opts)

@@ -18,7 +18,9 @@
 <py-config src="./config.json" type="json"></py-config>
 
 <py-script>
-    from upk2esphome.web import on_run_click
+    from upk2esphome.web import on_pyscript_ready, on_run_click
+
+    on_pyscript_ready()
 </py-script>
 
 <div class="container">
@@ -61,55 +63,55 @@
             <label class="form-label" for="profiles">Choose a predefined profile:</label>
             <select class="form-select" id="profiles"></select>
             <label class="form-label" for="profileUrl">Profile URL:</label>
-            <input class="form-control" type="text" id="profileUrl" readonly />
+            <input class="form-control" id="profileUrl" readonly type="text"/>
             <label class="form-label" for="input">Input data</label>
             <textarea class="form-control" id="input" rows="20" style="font-family: monospace"></textarea>
         </div>
         <div class="col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="options">
             <p>Conversion options</p>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_esphome_block" type="checkbox" value="">
+                <input class="form-check-input" id="opts_esphome_block" type="checkbox">
                 <label class="form-check-label" for="opts_esphome_block">Include <code>esphome:</code> block</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_name_mac" type="checkbox" value="">
+                <input class="form-check-input" id="opts_name_mac" type="checkbox">
                 <label class="form-check-label" for="opts_name_mac">Add MAC to device name</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_common" type="checkbox" value="">
+                <input class="form-check-input" id="opts_common" type="checkbox">
                 <label class="form-check-label" for="opts_common">Add common components</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_web_server" type="checkbox" value="">
-                <label class="form-check-label" for="opts_web_server">Add Web Server and Captive Portal</label>
+                <input class="form-check-input" id="opts_web_server" type="checkbox">
+                <label class="form-check-label" for="opts_web_server">Add Web Server & Captive Portal</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_restart" type="checkbox" value="">
+                <input class="form-check-input" id="opts_restart" type="checkbox">
                 <label class="form-check-label" for="opts_restart">Add restart button & sensor</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_uptime" type="checkbox" value="">
+                <input class="form-check-input" id="opts_uptime" type="checkbox">
                 <label class="form-check-label" for="opts_uptime">Add uptime sensor</label>
             </div>
             <div class="form-check">
-                <input checked class="form-check-input" id="opts_lt_version" type="checkbox" value="">
+                <input class="form-check-input" id="opts_lt_version" type="checkbox">
                 <label class="form-check-label" for="opts_lt_version">Add LT version sensor</label>
             </div>
             <div class="mt-3">
                 <label class="form-label" for="opts_wifi_ssid">Wi-Fi SSID</label>
-                <input class="form-control" id="opts_wifi_ssid" type="text" value="!secret wifi_ssid">
+                <input class="form-control" id="opts_wifi_ssid" type="text">
             </div>
             <div class="mt-3">
                 <label class="form-label" for="opts_wifi_password">Wi-Fi password</label>
-                <input class="form-control" id="opts_wifi_password" type="text" value="!secret wifi_password">
+                <input class="form-control" id="opts_wifi_password" type="text">
             </div>
             <div class="mt-3">
                 <label class="form-label" for="opts_ota_password">OTA password</label>
-                <input class="form-control" id="opts_ota_password" type="text" value="!secret ota_password">
+                <input class="form-control" id="opts_ota_password" type="text">
             </div>
             <div class="mt-3">
                 <label class="form-label" for="opts_api_password">API password</label>
-                <input class="form-control" id="opts_api_password" type="text" value="!secret api_password">
+                <input class="form-control" id="opts_api_password" type="text">
             </div>
         </div>
         <div class="col-sm-12 col-md-12 col-lg-5 col-xl-5 col-xxl-6">
@@ -134,53 +136,98 @@
 </div>
 
 <script>
-    $.getJSON("https://tuya-cloudcutter.github.io/api/devices.json", function (data) {
-        $.each(data, function (index, value) {
-            $("#profiles").append($("<option>", {
-                value: value.slug,
-                text: value.manufacturer + ' - ' + value.name
-            }));
-        });
-        var options = $("#profiles option");
-        options.detach().sort(function (a, b) {
-            var at = $(a).text().toLowerCase();
-            var bt = $(b).text().toLowerCase();
-            return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
-        });
-        $("#profiles").append($("<option>", {
-            value: 0,
-            text: "Select profile"
-        }));
-        options.appendTo("#profiles");
-        $("#profiles")[0].selectedIndex = 0;
-        const query = new URLSearchParams(window.location.search);
+    function setProfileFromUrl(noHistory = false) {
+        const query = new URLSearchParams(location.search);
         const profile = query.get('profile');
         if (profile) {
             const option = $(`#profiles option[value='${profile}']`);
             if (option.length) {
                 option.prop('selected', true);
-                options.trigger('change');
+                runProfile(query.get("profile"), noHistory);
             }
         }
-    });
+    }
 
-    $("#profiles").on("change", function () {
-        if (this.value === 0) {
+    function runProfile(slug, noHistory = false) {
+        if (slug === 0) {
             $("#warnings").empty();
             $("#logs").empty();
             $("#input").val("");
             $("#output").val("");
             $("#profileUrl").val("");
         } else {
-            $.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + this.value + ".json", function (data) {
-                const slug = data.slug;
-                data = JSON.stringify(data, undefined, 2)
-                $("#input").val(data);
-                localStorage.setItem("input", data);
-                $("#profileUrl").val(document.location.origin + document.location.pathname + "?profile=" + slug);
+            $.getJSON("https://tuya-cloudcutter.github.io/api/devices/" + slug + ".json", function (data) {
+                const textData = JSON.stringify(data, undefined, 2)
+                $("#input").val(textData);
+                localStorage.setItem("input", textData);
+
+                const profileUrl = document.location.origin + document.location.pathname + "?profile=" + data.slug;
+                if (!noHistory)
+                    history.pushState({}, null, profileUrl);
+                $("#profileUrl").val(profileUrl);
+
+                document.title = `${data.manufacturer} ${data.name} | UPK2ESPHome`;
+
                 $("#run").click();
             });
         }
+    }
+
+    function onPyscriptReady(defaultOptsPy) {
+        const defaultOpts = defaultOptsPy.toJs();
+        $("input, textarea").each(function () {
+            const el = $(this)[0];
+            if (el.hasAttribute("readonly"))
+                return;
+
+            let value = localStorage.getItem(el.id);
+            if (!value) {
+                if (!el.id.startsWith("opts_"))
+                    return;
+                const key = el.id.substring(5);
+                if (!defaultOpts.has(key))
+                    return;
+                value = `${defaultOpts.get(key)}`;
+            }
+
+            if (el.type === "text" || el.tagName === "TEXTAREA") {
+                if (!el.value)
+                    el.value = value;
+            } else if (el.type === "checkbox") {
+                el.checked = value === "true";
+            }
+        });
+    }
+
+    $.getJSON("https://tuya-cloudcutter.github.io/api/devices.json", function (data) {
+        const profiles = $("#profiles");
+        $.each(data, function (index, value) {
+            profiles.append($("<option>", {
+                value: value.slug,
+                text: value.manufacturer + ' - ' + value.name
+            }));
+        });
+        const options = $("#profiles option");
+        options.detach().sort(function (a, b) {
+            const at = $(a).text().toLowerCase();
+            const bt = $(b).text().toLowerCase();
+            return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
+        });
+        profiles.append($("<option>", {
+            value: 0,
+            text: "Select profile"
+        }));
+        options.appendTo("#profiles");
+        profiles[0].selectedIndex = 0;
+        setProfileFromUrl();
+    });
+
+    window.addEventListener("popstate", function () {
+        setProfileFromUrl(true);
+    })
+
+    $("#profiles").on("change", function () {
+        runProfile(this.value);
     });
 
     $("input, textarea").on("change", function () {
@@ -190,27 +237,27 @@
         } else if (el.type === "checkbox") {
             localStorage.setItem(el.id, el.checked);
         }
+
+        if (el.tagName === "TEXTAREA") {
+            const pageUrl = document.location.origin + document.location.pathname;
+            history.pushState({}, null, pageUrl);
+            $("#profileUrl").val("");
+
+            document.title = `UPK2ESPHome`;
+        }
+
         $("#run").click();
     });
 
-    $(document).ready(function () {
-        $("input, textarea").each(function () {
-            const el = $(this)[0];
-            const value = localStorage.getItem(el.id);
-            if (!value)
-                return;
-            if (el.type === "text" || el.tagName === "TEXTAREA") {
-                el.value = value;
-            } else if (el.type === "checkbox") {
-                el.checked = value === "true";
-            }
-        });
-    });
-
     $("#run").on("click", function () {
+        if (!pyscript || !pyscript.interpreter) {
+            setTimeout(() => {
+                $("#run").click();
+            }, 300)
+            return;
+        }
         pyscript.interpreter.globals.get("on_run_click")();
     });
-
 </script>
 <script crossorigin="anonymous"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"

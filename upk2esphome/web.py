@@ -1,8 +1,12 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
-from js import jQuery
+from js import jQuery, onPyscriptReady
 
 from upk2esphome import Opts, generate_yaml
+
+
+def on_pyscript_ready():
+    onPyscriptReady(Opts().__dict__)
 
 
 def on_run_click():
