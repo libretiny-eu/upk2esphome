@@ -1,7 +1,7 @@
 name: Push (dev), Pull Request
 on:
   push:
-    tags-ignore: ["v*.*.*"]
+    branches: ["**"]
   pull_request:
 jobs:
   lint-python:
