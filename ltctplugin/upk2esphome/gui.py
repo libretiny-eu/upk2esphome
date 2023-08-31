@@ -8,9 +8,11 @@ from os.path import dirname, isfile
 import wx
 import wx.adv
 import wx.xrc
+from ltchiptool.gui.base.zc import ZeroconfBase
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event
 from ltchiptool.util.logging import LoggingHandler
+from zeroconf import IPVersion, ServiceInfo
 
 from upk2esphome import Opts, generate_yaml
 
@@ -26,13 +28,16 @@ This serves mostly as a kickstart config, rather than a production-ready file. M
 
 **We do not take responsibility for using this tool and the generated configs.**
 """
+ZEROCONF_SERVICE = "_esphomelib._tcp.local."
 
 
-class UpkPanel(BasePanel):
+# noinspection PyPep8Naming
+class UpkPanel(BasePanel, ZeroconfBase):
     last_dir: str = None
     last_url: str = None
     logs_shown: bool = False
     disclaimer_shown: bool = False
+    kickstart_devices: dict[str, str] = None
 
     def __init__(self, parent: wx.Window, frame):
         super().__init__(parent, frame)
@@ -42,7 +47,11 @@ class UpkPanel(BasePanel):
 
         self.Notebook: wx.Notebook = self.FindWindowByName("notebook_upk", self)
 
-        self.BindButton("button_kickstart", self.OnDoKickstartClick)
+        self.Kickstart: wx.adv.CommandLinkButton = self.BindButton(
+            "button_kickstart",
+            self.OnDoKickstartClick,
+        )
+        self.Kickstart.Bind(wx.EVT_CONTEXT_MENU, self.OnDoKickstartRightClick)
         self.BindButton("button_cloudcutter", self.OnDoCloudcutterClick)
         self.BindButton("button_dump", self.OnDoDumpClick)
 
@@ -104,6 +113,12 @@ class UpkPanel(BasePanel):
             self.last_url = last_url
         if disclaimer_shown is not None:
             self.disclaimer_shown = disclaimer_shown
+
+    def OnActivate(self):
+        self.AddZeroconfBrowser(ZEROCONF_SERVICE)
+
+    def OnDeactivate(self):
+        self.StopZeroconf()
 
     def OnUpdate(self, target: wx.Window = None):
         if target is None:
@@ -177,21 +192,75 @@ class UpkPanel(BasePanel):
         )
         self.StartWork(work)
 
+    def OnZeroconfUpdate(self, services: dict[str, ServiceInfo]):
+        if self.kickstart_devices:
+            self.kickstart_devices.clear()
+        for serv_info in services.values():
+            if not serv_info.properties:
+                continue
+            address = serv_info.parsed_scoped_addresses(version=IPVersion.V4Only)[0]
+            project_name = serv_info.properties.get(b"project_name", None)
+            if not project_name:
+                continue
+
+            label = f"{serv_info.server.rstrip('.')} ({address})"
+            if self.kickstart_devices is None:
+                self.kickstart_devices = {}
+            self.kickstart_devices[label] = address
+        if self.kickstart_devices:
+            self.Kickstart.SetNote(
+                f"Found {len(self.kickstart_devices)} device(s): "
+                + ", ".join(self.kickstart_devices.keys())
+                + "\n"
+                "Right-click to enter IP manually"
+            )
+        elif self.kickstart_devices is not None:
+            self.Kickstart.SetNote("Found no Kickstart devices")
+
     @on_event
     def OnDoKickstartClick(self):
-        dialog = wx.TextEntryDialog(
-            self,
-            message="Enter URL (or IP address) of Kickstart dashboard:",
-            caption="Kickstart URL",
-            value=self.last_url or "",
-        )
-        if dialog.ShowModal() != wx.ID_OK:
+        self.OnDoKickstart(force_custom=False)
+
+    @on_event
+    def OnDoKickstartRightClick(self):
+        self.OnDoKickstart(force_custom=True)
+
+    def OnDoKickstart(self, force_custom: bool = False):
+        devices = dict(self.kickstart_devices or {})
+        if len(devices) == 0 or force_custom:
+            dialog = wx.TextEntryDialog(
+                self,
+                message="Enter URL (or IP address) of Kickstart dashboard:",
+                caption="Kickstart URL",
+                value=self.last_url or "",
+            )
+            if dialog.ShowModal() != wx.ID_OK:
+                dialog.Destroy()
+                return
+            url = dialog.GetValue().strip()
             dialog.Destroy()
-            return
-        url = dialog.GetValue().strip()
-        dialog.Destroy()
-        if not url:
-            return
+            if not url:
+                return
+        elif len(devices) != 1:
+            dialog = wx.SingleChoiceDialog(
+                self,
+                message=(
+                    "We've found a few devices running ESPHome-Kickstart. "
+                    "Please choose one:"
+                ),
+                caption="Kickstart device",
+                choices=list(devices.keys()),
+            )
+            if dialog.ShowModal() != wx.ID_OK:
+                dialog.Destroy()
+                return
+            choice = dialog.GetStringSelection()
+            dialog.Destroy()
+            if choice not in devices:
+                return
+            url = devices[choice]
+        else:
+            url = list(devices.values())[0]
 
         debug(f"Kickstart URL: {url}")
         self.last_url = url

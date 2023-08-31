@@ -3,12 +3,17 @@
 from typing import Any, Dict
 
 from ltctplugin.base import PluginBase
+from semantic_version.base import BaseSpec, SimpleSpec
 
 
 class Plugin(PluginBase):
     @property
     def title(self) -> str:
         return "UPK2ESPHome"
+
+    @property
+    def ltchiptool_version(self) -> BaseSpec | None:
+        return SimpleSpec(">=4.4.0")
 
     @property
     def has_cli(self) -> bool:
