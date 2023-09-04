@@ -43,32 +43,33 @@ class ConfigData:
                 return False
 
     @property
-    def upk(self) -> dict | None:
+    def upk(self) -> dict:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                return self.data.get("device_configuration", None)
+                return self.data.get("device_configuration", {})
             case ConfigData.Type.STORAGE:
-                return self.data.get("user_param_key", None)
+                return self.data.get("user_param_key", {})
             case ConfigData.Type.RAW:
                 return self.data
 
     @property
-    def uart_config(self) -> dict | None:
-        return self.data.get("baud_cfg", None) or self.data.get(
-            "uart_adapt_params", None
-        )
+    def uart_config(self) -> dict:
+        return self.data.get("baud_cfg", {}) or self.data.get("uart_adapt_params", {})
 
     @property
-    def model(self) -> dict | None:
-        return self.extras.get("model", None)
+    def model(self) -> dict:
+        return self.extras.get("model", {})
+
+    @property
+    def profile(self) -> dict:
+        profiles = self.data.get("profiles", [])
+        return profiles and profiles[0] or {}
 
     @property
     def data_device(self) -> dict | None:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                profiles = self.data.get("profiles", [])
-                profile = profiles and profiles[0] or {}
-                name = profile.get("name", None) or ""
+                name = self.profile.get("name", None) or ""
                 return dict(
                     firmwareKey=self.data.get("key", None),
                     productKey=None,
