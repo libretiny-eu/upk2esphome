@@ -291,74 +291,83 @@ The default choices are usually fine in most cases.</label>
 						</object>
 					</object>
 					<object>
-						<label>Device configuration</label>
+						<label>Source data</label>
 						<style>wxTAB_TRAVERSAL</style>
 						<bg>#F0F0F0</bg>
-						<object class="wxPanel" name="page_upk">
+						<object class="wxPanel" name="page_source">
 							<style>wxTAB_TRAVERSAL</style>
-							<object class="wxBoxSizer" name="sizer_upk">
-								<orient>wxVERTICAL</orient>
+							<object class="wxGridSizer" name="grid_sizer">
+								<rows>1</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
 								<object class="sizeritem">
-									<flag>wxALL|wxEXPAND</flag>
-									<border>5</border>
-									<object class="wxStaticText" name="text_upk">
-										<label>This page shows the raw user__param__key (UPK) structure.
-
-Based on this, ESPHome config is generated.</label>
-										<wrap>500</wrap>
-									</object>
-								</object>
-								<object class="sizeritem">
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxEXPAND</flag>
 									<border>5</border>
 									<option>1</option>
-									<object class="wxTextCtrl" name="input_upk">
-										<style>wxTE_MULTILINE|wxTE_READONLY</style>
-										<font>
-											<size>11</size>
-											<face>Consolas</face>
-										</font>
+									<object class="wxBoxSizer" name="sizer_source_data">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<flag>wxALL|wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="text_source_data">
+												<label>This page shows the extracted Storage Area JSON.
+It contains a device schema and some other information
+that are useful for building Cloudcutter profiles.
+If Cloudcutter doesn't support your device yet,
+consider submitting the JSON to the issues page:</label>
+												<wrap>400</wrap>
+												<style>wxST_ELLIPSIZE_END</style>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxHyperlinkCtrl" name="link_source_data">
+												<label>https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues</label>
+												<style>wxHL_DEFAULT_STYLE</style>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<flag>wxALL|wxEXPAND</flag>
+											<border>5</border>
+											<option>1</option>
+											<object class="wxTextCtrl" name="input_source_data">
+												<style>wxTE_MULTILINE|wxTE_READONLY</style>
+												<font>
+													<size>11</size>
+													<face>Consolas</face>
+												</font>
+											</object>
+										</object>
 									</object>
 								</object>
-							</object>
-						</object>
-					</object>
-					<object>
-						<label>Storage data</label>
-						<style>wxTAB_TRAVERSAL</style>
-						<bg>#F0F0F0</bg>
-						<object class="wxPanel" name="page_storage">
-							<style>wxTAB_TRAVERSAL</style>
-							<object class="wxBoxSizer" name="sizer_storage">
-								<orient>wxVERTICAL</orient>
 								<object class="sizeritem">
-									<flag>wxALL|wxEXPAND</flag>
-									<border>5</border>
-									<object class="wxStaticText" name="text_storage_1">
-										<label>This page shows the extracted Storage Area JSON. It contains a device schema and some other information that are useful for building Cloudcutter profiles.
-
-If Cloudcutter doesn't support your device yet, consider submitting the JSON to the issues page:</label>
-										<wrap>500</wrap>
-									</object>
-								</object>
-								<object class="sizeritem">
-									<flag>wxALL</flag>
-									<border>5</border>
-									<object class="wxHyperlinkCtrl" name="link_storage">
-										<label>https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues</label>
-										<style>wxHL_DEFAULT_STYLE</style>
-									</object>
-								</object>
-								<object class="sizeritem">
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxEXPAND</flag>
 									<border>5</border>
 									<option>1</option>
-									<object class="wxTextCtrl" name="input_storage">
-										<style>wxTE_MULTILINE|wxTE_READONLY</style>
-										<font>
-											<size>11</size>
-											<face>Consolas</face>
-										</font>
+									<object class="wxBoxSizer" name="sizer_source_extras">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<flag>wxALL|wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="text_source_extras">
+												<label>Additional data passed to UPK2ESPHome:</label>
+												<wrap>400</wrap>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<flag>wxALL|wxEXPAND</flag>
+											<border>5</border>
+											<option>1</option>
+											<object class="wxTextCtrl" name="input_source_extras">
+												<style>wxTE_MULTILINE|wxTE_READONLY</style>
+												<font>
+													<size>11</size>
+													<face>Consolas</face>
+												</font>
+											</object>
+										</object>
 									</object>
 								</object>
 							</object>

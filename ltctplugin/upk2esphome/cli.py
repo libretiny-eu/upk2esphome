@@ -11,7 +11,7 @@ from ltctplugin.upk2esphome.common import (
     cloudcutter_list_devices,
 )
 from ltctplugin.upk2esphome.work import UpkThread
-from upk2esphome import Opts, generate_yaml
+from upk2esphome import Opts, upk2esphome
 
 
 def add_options():
@@ -165,7 +165,7 @@ def write_upk(data: dict, output: click.File, storage_only: bool, **kwargs):
         text = json.dumps(data, indent="\t")
     else:
         opts = Opts(**kwargs)
-        yr = generate_yaml(data, opts)
+        yr = upk2esphome(data, opts)
         for line in yr.logs:
             info(f"UPK: {line}")
         for line in yr.warnings:

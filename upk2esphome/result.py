@@ -1,9 +1,17 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
+import re
+
+import yaml
+
+
+class MyDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, **_):
+        return super(MyDumper, self).increase_indent(flow, False)
+
 
 class YamlResult:
     data: dict
-    text: str
     logs: list[str]
     warnings: list[str]
     errors: list[str]
@@ -11,11 +19,19 @@ class YamlResult:
 
     def __init__(self):
         self.data = {}
-        self.text = ""
         self.logs = []
         self.warnings = []
         self.errors = []
         self.found = False
+
+    @property
+    def text(self) -> str:
+        text = yaml.dump(self.data, sort_keys=False, Dumper=MyDumper)
+        text = re.sub(r"'!secret ([\w_]+)'", r"!secret \1", text)
+        text = re.sub(r"\n([a-z])", r"\n\n\1", text)
+        text = text.replace("'", '"')
+        text = text.replace(" {}", "")
+        return text
 
     def log(self, text: str):
         self.logs.append(text)

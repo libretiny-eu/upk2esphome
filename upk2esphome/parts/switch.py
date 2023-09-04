@@ -1,11 +1,13 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
+from upk2esphome.config import ConfigData
 from upk2esphome.generator import invert, pull
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
 
-def generate(yr: YamlResult, config: dict, opts: Opts):
+def generate(yr: YamlResult, config: ConfigData, opts: Opts):
+    config = config.upk or {}
     keys = [
         "bt1_pin",
         "bt2_pin",

@@ -210,18 +210,18 @@
                 wrap="500"
                 flags="wxEXPAND" />
               <node
+                class="wxButton"
+                label="Copy"
+                var_name="button_esphome_copy"
+                column="1"
+                rowspan="2" />
+              <node
                 class="wxStaticText"
                 label="We do not take responsibility for using this tool and the generated configs."
                 var_name="text_esphome_2"
                 wrap="500"
                 font="normal size,,bold"
                 row="1" />
-              <node
-                class="wxButton"
-                label="Copy"
-                var_name="button_esphome_copy"
-                column="1"
-                rowspan="2" />
               <node
                 class="wxTextCtrl"
                 style="wxTE_MULTILINE|wxTE_READONLY"
@@ -235,58 +235,62 @@
           </node>
           <node
             class="BookPage"
-            label="Device configuration"
-            var_name="page_upk"
+            label="Source data"
+            var_name="page_source"
             background_colour="wxSYS_COLOUR_BTNFACE"
             window_style="wxTAB_TRAVERSAL">
             <node
-              class="wxBoxSizer"
-              orientation="wxVERTICAL"
-              var_name="sizer_upk">
+              class="wxGridSizer"
+              rows="1">
               <node
-                class="wxStaticText"
-                label="This page shows the raw user__param__key (UPK) structure.&#10;&#10;Based on this, ESPHome config is generated."
-                markup="1"
-                var_name="text_upk"
-                wrap="500"
-                flags="wxEXPAND" />
-              <node
-                class="wxTextCtrl"
-                style="wxTE_MULTILINE|wxTE_READONLY"
-                var_name="input_upk"
-                font="Consolas,11"
+                class="wxBoxSizer"
+                orientation="wxVERTICAL"
+                var_name="sizer_source_data"
+                borders=""
                 flags="wxEXPAND"
-                proportion="1" />
-            </node>
-          </node>
-          <node
-            class="BookPage"
-            label="Storage data"
-            var_name="page_storage"
-            background_colour="wxSYS_COLOUR_BTNFACE"
-            window_style="wxTAB_TRAVERSAL">
-            <node
-              class="wxBoxSizer"
-              orientation="wxVERTICAL"
-              var_name="sizer_storage">
+                proportion="1">
+                <node
+                  class="wxStaticText"
+                  label="This page shows the extracted Storage Area JSON.&#10;It contains a device schema and some other information&#10;that are useful for building Cloudcutter profiles.&#10;If Cloudcutter doesn't support your device yet,&#10;consider submitting the JSON to the issues page:"
+                  markup="1"
+                  style="wxST_ELLIPSIZE_END"
+                  var_name="text_source_data"
+                  wrap="400"
+                  flags="wxEXPAND" />
+                <node
+                  class="wxHyperlinkCtrl"
+                  label="https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues"
+                  var_name="link_source_data" />
+                <node
+                  class="wxTextCtrl"
+                  style="wxTE_MULTILINE|wxTE_READONLY"
+                  var_name="input_source_data"
+                  font="Consolas,11"
+                  flags="wxEXPAND"
+                  proportion="1" />
+              </node>
               <node
-                class="wxStaticText"
-                label="This page shows the extracted Storage Area JSON. It contains a device schema and some other information that are useful for building Cloudcutter profiles.&#10;&#10;If Cloudcutter doesn't support your device yet, consider submitting the JSON to the issues page:"
-                markup="1"
-                var_name="text_storage_1"
-                wrap="500"
-                flags="wxEXPAND" />
-              <node
-                class="wxHyperlinkCtrl"
-                label="https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues"
-                var_name="link_storage" />
-              <node
-                class="wxTextCtrl"
-                style="wxTE_MULTILINE|wxTE_READONLY"
-                var_name="input_storage"
-                font="Consolas,11"
+                class="wxBoxSizer"
+                orientation="wxVERTICAL"
+                var_name="sizer_source_extras"
+                borders=""
                 flags="wxEXPAND"
-                proportion="1" />
+                proportion="1">
+                <node
+                  class="wxStaticText"
+                  label="Additional data passed to UPK2ESPHome:"
+                  markup="1"
+                  var_name="text_source_extras"
+                  wrap="400"
+                  flags="wxEXPAND" />
+                <node
+                  class="wxTextCtrl"
+                  style="wxTE_MULTILINE|wxTE_READONLY"
+                  var_name="input_source_extras"
+                  font="Consolas,11"
+                  flags="wxEXPAND"
+                  proportion="1" />
+              </node>
             </node>
           </node>
         </node>

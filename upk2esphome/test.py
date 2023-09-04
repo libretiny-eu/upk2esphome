@@ -5,7 +5,7 @@ if __name__ == "__main__":
     from glob import glob
     from os.path import dirname, join
 
-    from .generator import generate_yaml
+    from .generator import upk2esphome
     from .opts import Opts
 
     opts = Opts(
@@ -18,8 +18,6 @@ if __name__ == "__main__":
     )
 
     mask = "*.txt"
-    if len(sys.argv) > 1:
-        mask = f"{sys.argv[1]}.txt"
 
     for file in glob(join(dirname(__file__), "tests", mask)):
         if len(sys.argv) == 2 and sys.argv[1] not in file:
@@ -27,9 +25,9 @@ if __name__ == "__main__":
         with open(file, "r") as f:
             d = f.read().strip()
         print(file)
-        yr = generate_yaml(d, opts)
-        print("\n".join(yr.logs))
-        print("\n".join(yr.warnings))
-        print("\n".join(yr.errors))
+        yr = upk2esphome(d, opts)
+        print("\n".join(f"I: {s}" for s in yr.logs))
+        print("\n".join(f"W: {s}" for s in yr.warnings))
+        print("\n".join(f"E: {s}" for s in yr.errors))
         print(yr.text)
         print("-" * 80)

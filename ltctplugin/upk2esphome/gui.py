@@ -14,7 +14,7 @@ from ltchiptool.gui.utils import on_event
 from ltchiptool.util.logging import LoggingHandler
 from zeroconf import IPVersion, ServiceInfo
 
-from upk2esphome import Opts, generate_yaml
+from upk2esphome import Opts, upk2esphome
 
 from .common import cloudcutter_get_device, cloudcutter_list_devices
 from .work import UpkThread
@@ -72,8 +72,10 @@ class UpkPanel(BasePanel, ZeroconfBase):
         self.BindButton("button_esphome_copy", self.OnEsphomeCopyClick)
 
         self.TextEsphome = self.BindTextCtrl("input_esphome")
-        self.TextUpk = self.BindTextCtrl("input_upk")
-        self.TextStorage = self.BindTextCtrl("input_storage")
+        self.TextData = self.BindTextCtrl("input_source_data")
+        self.TextExtras = self.BindTextCtrl("input_source_extras")
+        self.LabelData = self.FindStaticText("text_source_data")
+        self.LabelExtras = self.FindStaticText("text_source_extras")
 
         self.EnableFileDrop()
 
@@ -86,6 +88,8 @@ class UpkPanel(BasePanel, ZeroconfBase):
             if key not in self.Opts:
                 continue
             self.Opts[key].ChangeValue(getattr(default_opts, key))
+
+        self.config_valid = False
 
     def GetSettings(self) -> dict:
         return dict(
@@ -123,13 +127,14 @@ class UpkPanel(BasePanel, ZeroconfBase):
     def OnUpdate(self, target: wx.Window = None):
         if target is None:
             return
-        debug(f"OnUpdate, target: {type(target)}, upk: {self.upk}")
-        upk = self.upk
-        if not upk:
+        debug(f"OnUpdate, target: {type(target)}")
+        data = self.data
+        if not data:
             self.TextEsphome.Clear()
             self.logs_shown = False
             return
-        if target == self.TextUpk:
+        if target == self.TextData or target == self.TextExtras:
+            # show error logs again after changing input data
             self.logs_shown = False
 
         if not self.disclaimer_shown:
@@ -141,36 +146,45 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.disclaimer_shown = True
 
         opts = Opts(**self.GetSettings()["opts"])
-        yr = generate_yaml(upk, opts)
+        yr = upk2esphome(data, opts)
         self.TextEsphome.ChangeValue(yr.text)
 
         if not self.logs_shown:
+            # show errors only once, then allow to change generation options
             self.logs_shown = True
+
+            self.config_valid = not yr.errors
+
             for line in yr.errors:
                 error(line)
+            for line in yr.warnings:
+                warning(line)
+            for line in yr.logs:
+                info(f"UPK: {line}")
+
             if yr.errors:
                 wx.MessageBox(
-                    message="While generating YAML:\n\n" + "\n".join(yr.errors),
+                    message="\n".join(yr.errors),
                     caption="Error",
                     style=wx.ICON_ERROR,
                 )
-            for line in yr.warnings:
-                warning(line)
+            else:
+                # navigate to Options page
+                self.Notebook.SetSelection(1)
+
             if yr.warnings:
                 wx.MessageBox(
                     message="While generating YAML:\n\n" + "\n".join(yr.warnings),
                     caption="Warning",
                     style=wx.ICON_WARNING,
                 )
-            for line in yr.logs:
-                info(f"UPK: {line}")
 
     def OnStorageData(self, storage: dict):
-        self.storage = storage
+        self.data = storage
         self.DoUpdate()
 
     def OnStorageError(self, error_text: str):
-        self.storage = None
+        self.data = None
         self.DoUpdate()
         wx.MessageBox(
             message=error_text,
@@ -303,8 +317,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
             LoggingHandler.get().emit_exception(e)
             return
 
-        self.storage = None
-        self.upk = device.get("device_configuration", {})
+        self.data = device
 
     @on_event
     def OnDoDumpClick(self):
@@ -339,46 +352,32 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.TextEsphome.SelectAll()
 
     @property
-    def upk(self):
-        text = self.TextUpk.GetValue() or None
+    def data(self) -> dict | None:
+        text = self.TextData.GetValue() or None
         return text and json.loads(text)
 
-    @upk.setter
-    def upk(self, value: dict | None):
+    @data.setter
+    def data(self, value: dict | None) -> None:
         text = value and json.dumps(value, indent=4) or ""
-        self.TextUpk.ChangeValue(text)
-        if value:
-            # valid UPK, go to options page
-            self.Notebook.SetSelection(1)
-        elif value is not None:
-            # empty UPK == no UPK in storage
-            wx.MessageBox(
-                message=(
-                    "This device doesn't contain user_param_key config. "
-                    "Possible causes:\n"
-                    "- it has custom/non-generic firmware\n"
-                    "- it uses TuyaMCU\n\n"
-                    "Auto-generating ESPHome YAML is not possible."
-                ),
-                caption="Missing configuration",
-                style=wx.ICON_WARNING,
-            )
-        # else: UPK is None, so we're clearing the state
-        self.DoUpdate(self.TextUpk)
+        self.TextData.ChangeValue(text or "")
+        self.DoUpdate(self.TextData)
 
     @property
-    def storage(self):
-        text = self.TextStorage.GetValue() or None
+    def extras(self) -> dict | None:
+        text = self.TextExtras.GetValue() or None
         return text and json.loads(text)
 
-    @storage.setter
-    def storage(self, value: dict | None):
+    @extras.setter
+    def extras(self, value: dict | None) -> None:
         text = value and json.dumps(value, indent=4) or ""
-        self.TextStorage.ChangeValue(text)
-        if value is None:
-            # clear UPK along with storage
-            self.upk = None
-        else:
-            # set UPK if present, or set empty if not
-            self.upk = value.get("user_param_key", {})
-        self.DoUpdate(self.TextStorage)
+        self.TextExtras.ChangeValue(text or "")
+        self.DoUpdate(self.TextExtras)
+
+    @property
+    def config_valid(self) -> bool:
+        return False
+
+    @config_valid.setter
+    def config_valid(self, value: bool) -> None:
+        self.Notebook.GetPage(1).Enable(value)
+        self.Notebook.GetPage(2).Enable(value)

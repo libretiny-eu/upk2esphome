@@ -2,7 +2,7 @@
 
 from js import jQuery, onPyscriptReady
 
-from upk2esphome import Opts, generate_yaml
+from upk2esphome import Opts, upk2esphome
 
 
 def on_pyscript_ready():
@@ -21,8 +21,8 @@ def on_run_click():
         opts[el_id[5:]] = el_value
     opts = Opts(**opts)
 
-    config = jQuery("#input").val()
-    yr = generate_yaml(config, opts)
+    input_data = jQuery("#input").val()
+    yr = upk2esphome(input_data, opts)
     jQuery("#output").val(yr.text)
     jQuery("#logs").html("<pre>" + "<br>".join(yr.logs) + "</pre>")
     jQuery("#warnings").html(
