@@ -95,6 +95,10 @@ class ConfigData:
         return None
 
     @property
+    def schema_id(self) -> str | None:
+        return self.data.get("gw_di", {}).get("s_id", None)
+
+    @property
     def data_device(self) -> dict | None:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:

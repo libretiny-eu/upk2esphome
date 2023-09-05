@@ -47,3 +47,4 @@ Otherwise, try downloading the schema again.
 """
 
 SCHEMA_PULL_URL = "https://schema.upk.libretiny.eu/pullSchema"
+SCHEMA_URL_PREFIX = "https://schema.upk.libretiny.eu/schemas/"

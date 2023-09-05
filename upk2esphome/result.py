@@ -36,7 +36,9 @@ class YamlResult:
         text = re.sub(r"'!secret ([\w_]+)'", r"!secret \1", text)
         text = re.sub(r"\n([a-z])", r"\n\n\1", text)
         text = text.replace("'", '"')
+        text = re.sub(r'_\d+: "(.+?)"', r"# \1", text)
         text = text.replace(" {}", "")
+        text = text.replace("{}", "")
         return text
 
     def log(self, text: str):

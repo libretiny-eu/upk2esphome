@@ -33,3 +33,34 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         yr.warn("No schema model for TuyaMCU - can't process datapoints")
         yr.needs_tuyamcu_model = True
         return
+
+    model = config.model
+    model_id = model.get("modelId", None)
+    schema_id = config.schema_id
+    services = model.get("services", None)
+    if not model_id or not isinstance(services, list):
+        yr.warn("Invalid schema model structure: missing 'modelId' or 'services'")
+        yr.needs_tuyamcu_model = True
+        return
+
+    if schema_id and model_id != schema_id:
+        yr.warn(
+            f"Downloaded schema ID ({model_id}) "
+            f"doesn't match device schema ID ({schema_id})"
+        )
+        yr.needs_tuyamcu_model = True
+        return
+
+    yr.data["tuya"] = {
+        "_1": f"DPIDs processed from schema model: {model_id}",
+    }
+
+    # mark 'found' only if supported DP component was processed
+    yr.found = False
+    for service in services:
+        for dp_data in service.get("properties", []):
+            add_dp(yr, config, opts, dp_data)
+
+
+def add_dp(yr: YamlResult, config: ConfigData, opts: Opts, dp_data: dict):
+    pass

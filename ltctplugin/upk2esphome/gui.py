@@ -172,7 +172,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.disclaimer_shown = True
 
         opts = Opts(**self.GetSettings()["opts"])
-        yr = upk2esphome(data, opts)
+        yr = upk2esphome(raw_data=data, opts=opts, raw_extras=self.extras)
         # update UI according to the generation result
         self.last_result = yr
         if not yr.errors:
@@ -421,6 +421,11 @@ class UpkPanel(BasePanel, ZeroconfBase):
                 and self.last_result.config.data_software
             ),
             license_=self.schema_license,
+            schema_id=(
+                self.last_result
+                and self.last_result.config
+                and self.last_result.config.schema_id
+            ),
             on_success=self.OnSchemaResponse,
             on_error=self.OnSchemaError,
         )
@@ -538,19 +543,13 @@ class UpkPanel(BasePanel, ZeroconfBase):
 
         model = model_response.get("model", {})
         model_id = model.get("modelId", None)
-        schema_id = active_response.get("schemaId", None)
+        schema_id = model_id or active_response.get("schemaId", None)
         category_name = details_response.get("category_name", "Unknown")
         category = details_response.get("category", "unk")
-        name = details_response.get("model", "")
+        name = details_response.get("model", "Device")
 
-        self.SchemaDeviceCategory.ChangeValue(
-            category_name
-            and f"{category_name} ({category})"
-            or " ".join(value.get("errors", []))
-        )
-        self.SchemaDeviceName.ChangeValue(
-            f"{name} - schema ID: {model_id or schema_id}"
-        )
+        self.SchemaDeviceCategory.ChangeValue(f"{category_name} ({category})")
+        self.SchemaDeviceName.ChangeValue(f"{name} - schema ID: {schema_id}")
 
         if not model:
             wx.MessageBox(
