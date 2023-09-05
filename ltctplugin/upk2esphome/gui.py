@@ -15,7 +15,13 @@ from ltchiptool.util.logging import LoggingHandler
 from zeroconf import IPVersion, ServiceInfo
 
 from upk2esphome import Opts, YamlResult, upk2esphome
-from upk2esphome.const import DISCLAIMER_TEXT, TUYAMCU_MESSAGE
+from upk2esphome.const import (
+    DISCLAIMER_TEXT,
+    MESSAGE_FETCHED_SCHEMA_MODEL,
+    MESSAGE_SCHEMA_INCORRECT_MODEL,
+    MESSAGE_SCHEMA_MISSING_MODEL,
+    MESSAGE_TUYAMCU,
+)
 
 from .common import cloudcutter_get_device, cloudcutter_list_devices
 from .work import UpkThread
@@ -188,13 +194,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
                 if self.extras:
                     # warn when extras filled but model still needed
                     wx.MessageBox(
-                        message=(
-                            "Incorrect device schema model\n\n"
-                            "UPK2ESPHome couldn't generate TuyaMCU config based on "
-                            "the provided schema model.\n\n"
-                            "If you feel that's an error, try downloading "
-                            "the schema again."
-                        ),
+                        message=MESSAGE_SCHEMA_INCORRECT_MODEL.strip(),
                         caption="Warning",
                         style=wx.ICON_WARNING,
                     )
@@ -202,7 +202,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
                     # otherwise ask the user to fill extras
                     dialog = wx.MessageDialog(
                         self,
-                        message=TUYAMCU_MESSAGE.strip(),
+                        message=MESSAGE_TUYAMCU.strip(),
                         caption="Found TuyaMCU device",
                         style=wx.ICON_INFORMATION | wx.OK | wx.CANCEL,
                     )
@@ -554,12 +554,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
 
         if not model:
             wx.MessageBox(
-                message=(
-                    "Missing schema model description\n\n"
-                    "The API response doesn't include the schema model.\n"
-                    "Please inspect the response data and report an error "
-                    "to the LibreTiny developers."
-                ),
+                message=MESSAGE_SCHEMA_MISSING_MODEL.strip(),
                 caption="Error",
                 style=wx.ICON_ERROR,
             )
@@ -568,11 +563,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
         yr = self.last_result
         if yr and yr.needs_tuyamcu_model:
             wx.MessageBox(
-                message=(
-                    "Fetched schema model\n\n"
-                    "The schema model for TuyaMCU has been downloaded.\n\n"
-                    "Press OK to continue setting up your ESPHome config."
-                ),
+                message=MESSAGE_FETCHED_SCHEMA_MODEL.strip(),
                 caption="Success",
                 style=wx.ICON_INFORMATION,
             )
