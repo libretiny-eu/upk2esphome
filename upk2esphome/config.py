@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Literal
 
 
 @dataclass
@@ -64,6 +65,35 @@ class ConfigData:
     def profile(self) -> dict:
         profiles = self.data.get("profiles", [])
         return profiles and profiles[0] or {}
+
+    @property
+    def chip_name(
+        self,
+    ) -> Literal["BK7231T"] | Literal["BK7231N"] | Literal["?"] | None:
+        module = self.upk.get("module", "")
+        if module:
+            match module[0:2]:
+                case "WB":
+                    return "BK7231T"
+                case "CB":
+                    return "BK7231N"
+                case _:
+                    return "?"
+        chip = self.profile.get("name", "").rpartition(" ")[2]
+        if chip:
+            match chip:
+                case "BK7231T":
+                    return "BK7231T"
+                case "BK7231N":
+                    return "BK7231N"
+                case _:
+                    return "?"
+        if self.type == ConfigData.Type.STORAGE:
+            if "uart_adapt_params" in self.data:
+                return "BK7231T"
+            if "baud_cfg" in self.data:
+                return "BK7231N"
+        return None
 
     @property
     def data_device(self) -> dict | None:
