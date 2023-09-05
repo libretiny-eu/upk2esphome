@@ -73,9 +73,9 @@ def upk2esphome(
     opts: Opts,
     raw_extras: Union[str, dict] = None,
 ) -> YamlResult:
-    from .parts import bulb, module, monitor, netled, static, switch
+    from .parts import bulb, module, monitor, netled, static, switch, tuyamcu
 
-    parts = [module, static, bulb, switch, netled, monitor]
+    parts = [module, static, bulb, switch, netled, monitor, tuyamcu]
     yr = YamlResult()
 
     try:
@@ -100,9 +100,16 @@ def upk2esphome(
 
     if not yr.found and not yr.errors:
         yr.error(
-            "No actual components were added! This means that the type of your device "
-            "is not yet supported by this program. This includes for example "
-            "thermometers, water leak sensors, or fan controllers."
+            "No actual components were added!\n"
+            "This means that **valid configuration has been found**,\n"
+            "but this type of device is not yet supported by this program.\n"
+            "This includes for example thermometers, water leak sensors, "
+            "or fan controllers."
         )
 
+    if yr.errors:
+        yr.logs = []
+        yr.warnings = []
+
+    yr.config = config
     return yr

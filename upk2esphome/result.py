@@ -4,6 +4,8 @@ import re
 
 import yaml
 
+from upk2esphome.config import ConfigData
+
 
 class MyDumper(yaml.Dumper):
     def increase_indent(self, flow=False, **_):
@@ -16,6 +18,8 @@ class YamlResult:
     warnings: list[str]
     errors: list[str]
     found: bool
+    config: ConfigData | None
+    needs_tuyamcu_model: bool
 
     def __init__(self):
         self.data = {}
@@ -23,6 +27,8 @@ class YamlResult:
         self.warnings = []
         self.errors = []
         self.found = False
+        self.config = None
+        self.needs_tuyamcu_model = False
 
     @property
     def text(self) -> str:

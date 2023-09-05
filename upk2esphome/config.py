@@ -18,7 +18,6 @@ class ConfigData:
 
     @staticmethod
     def build(data: dict, extras: dict) -> "ConfigData":
-        type = None
         if "schemas" in data and "profiles" in data:
             type = ConfigData.Type.CLOUDCUTTER
         elif "gw_bi" in data:
@@ -34,10 +33,8 @@ class ConfigData:
     def is_tuya_mcu(self) -> bool:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                profiles = self.data.get("profiles", [])
-                profile = profiles and profiles[0] or {}
-                name = profile.get("sub_name", None) or ""
-                return name.startswith("bk7231") and "common" in name
+                slug = self.profile_slug
+                return slug.startswith("bk7231") and "common" in slug
             case ConfigData.Type.STORAGE:
                 return "baud_cfg" in self.data or "uart_adapt_params" in self.data
             case ConfigData.Type.RAW:
@@ -62,9 +59,12 @@ class ConfigData:
         return self.extras.get("model", {})
 
     @property
-    def profile(self) -> dict:
+    def profile_slug(self) -> str:
         profiles = self.data.get("profiles", [])
-        return profiles and profiles[0] or {}
+        profile = profiles and profiles[0] or {}
+        if isinstance(profile, str):
+            return profile.lower()
+        return profile.get("slug", "").lower()
 
     @property
     def chip_name(
@@ -79,15 +79,14 @@ class ConfigData:
                     return "BK7231N"
                 case _:
                     return "?"
-        chip = self.profile.get("name", "").rpartition(" ")[2]
-        if chip:
-            match chip:
-                case "BK7231T":
-                    return "BK7231T"
-                case "BK7231N":
-                    return "BK7231N"
-                case _:
-                    return "?"
+        slug = self.profile_slug
+        if slug:
+            if "bk7231t" in slug:
+                return "BK7231T"
+            if "bk7231s" in slug:
+                return "BK7231T"
+            if "bk7231n" in slug:
+                return "BK7231N"
         if self.type == ConfigData.Type.STORAGE:
             if "uart_adapt_params" in self.data:
                 return "BK7231T"
@@ -99,19 +98,20 @@ class ConfigData:
     def data_device(self) -> dict | None:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                name = self.profile.get("name", None) or ""
+                key = self.data.get("key", None)
                 return dict(
-                    firmwareKey=self.data.get("key", None),
-                    productKey=None,
+                    firmwareKey=key if key.startswith("key") else None,
+                    productKey=key if not key.startswith("key") else None,
                     factoryPin=None,
-                    softwareVer=name.partition(" ")[0] or None,
+                    softwareVer=None,
                 )
             case ConfigData.Type.STORAGE:
                 gw_di = self.data.get("gw_di", {})
                 gw_bi = self.data.get("gw_bi", {})
+                pk = gw_di.get("pk", None)
                 return dict(
                     firmwareKey=gw_di.get("firmk", None),
-                    productKey=gw_di.get("pk", None),
+                    productKey=pk if not pk.startswith("key") else None,
                     factoryPin=gw_bi.get("fac_pin", None),
                     softwareVer=gw_di.get("swv", None),
                 )
@@ -137,5 +137,5 @@ class ConfigData:
             return None
         return dict(
             uuid=gw_bi.get("uuid", None),
-            authKey=gw_bi.get("authKey", None),
+            authKey=gw_bi.get("auth_key", None),
         )

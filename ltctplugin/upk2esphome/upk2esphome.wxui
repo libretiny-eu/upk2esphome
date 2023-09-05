@@ -293,6 +293,241 @@
               </node>
             </node>
           </node>
+          <node
+            class="BookPage"
+            label="Schema Download"
+            var_name="page_schema"
+            background_colour="wxSYS_COLOUR_BTNFACE"
+            window_style="wxTAB_TRAVERSAL|wxVSCROLL">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="sizer_schema"
+              flags="wxEXPAND">
+              <node
+                class="wxStaticText"
+                label="This page allows to download device schema model descriptions from the Tuya Cloud API.&#10;&#10;Having the schema model allows UPK2ESPHome to generate YAML with appropriate datapoints (DPIDs) for TuyaMCU." />
+              <node
+                class="wxStaticText"
+                label="All necessary parameters have been filled out for you, based on the device configuration you chose."
+                var_name="text_guided_1"
+                font="normal size,italic" />
+              <node
+                class="wxStaticText"
+                label="Press Download to start the process."
+                var_name="text_guided_2"
+                font="normal size,,bold" />
+              <node
+                class="wxStaticLine"
+                size="20,-1d"
+                flags="wxEXPAND" />
+              <node
+                class="wxBoxSizer"
+                borders="wxLEFT"
+                flags="wxEXPAND">
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_2"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Firmware Key"
+                    var_name="m_staticText_4"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    var_name="input_firmware_key"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_3"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Product Key"
+                    var_name="m_staticText_5"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    var_name="input_product_key"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_4"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Factory Pin"
+                    var_name="m_staticText_6"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    var_name="input_factory_pin"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_5"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Software Version"
+                    var_name="m_staticText_7"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    var_name="input_software_ver"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+              </node>
+              <node
+                class="wxStaticLine"
+                var_name="static_line_2"
+                size="20,-1d"
+                flags="wxEXPAND" />
+              <node
+                class="wxCollapsiblePane"
+                collapsed="1"
+                label="Show all options (advanced)"
+                style="wxCP_DEFAULT_STYLE|wxCP_NO_TLW_RESIZE"
+                var_name="collapsible_schema"
+                borders=""
+                flags="wxEXPAND">
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_6"
+                  flags="wxEXPAND">
+                  <node
+                    class="wxBoxSizer"
+                    var_name="box_sizer_7"
+                    borders="wxLEFT"
+                    flags="wxEXPAND">
+                    <node
+                      class="wxBoxSizer"
+                      orientation="wxVERTICAL"
+                      var_name="box_sizer_9"
+                      borders=""
+                      proportion="1">
+                      <node
+                        class="wxStaticText"
+                        label="License UUID"
+                        var_name="m_staticText_8"
+                        borders="wxBOTTOM|wxRIGHT" />
+                      <node
+                        class="wxTextCtrl"
+                        var_name="input_uuid"
+                        borders="wxBOTTOM|wxRIGHT"
+                        flags="wxEXPAND" />
+                    </node>
+                    <node
+                      class="wxBoxSizer"
+                      orientation="wxVERTICAL"
+                      var_name="box_sizer_11"
+                      borders=""
+                      proportion="1">
+                      <node
+                        class="wxStaticText"
+                        label="License AuthKey"
+                        var_name="m_staticText_10"
+                        borders="wxBOTTOM|wxRIGHT" />
+                      <node
+                        class="wxTextCtrl"
+                        var_name="input_auth_key"
+                        borders="wxBOTTOM|wxRIGHT"
+                        flags="wxEXPAND" />
+                    </node>
+                    <node
+                      class="wxStaticText"
+                      label=""
+                      var_name="m_staticText_9"
+                      borders="wxTOP|wxBOTTOM|wxRIGHT"
+                      proportion="1" />
+                    <node
+                      class="wxStaticText"
+                      label=""
+                      var_name="m_staticText_11"
+                      borders="wxTOP|wxBOTTOM|wxRIGHT"
+                      proportion="1" />
+                  </node>
+                </node>
+              </node>
+              <node
+                class="wxCommandLinkButton"
+                main_label="Download"
+                note="Connect to Tuya Cloud API to fetch device schema"
+                var_name="button_schema_download"
+                flags="wxEXPAND" />
+              <node
+                class="wxStaticLine"
+                var_name="static_line_3"
+                size="20,-1d"
+                flags="wxEXPAND" />
+              <node
+                class="wxBoxSizer"
+                var_name="box_sizer_8"
+                borders="wxLEFT"
+                flags="wxEXPAND">
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_10"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Device category"
+                    var_name="m_staticText_12"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    style="wxTE_READONLY"
+                    var_name="input_device_category"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="box_sizer_12"
+                  borders=""
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Model name"
+                    var_name="m_staticText_13"
+                    borders="wxTOP|wxBOTTOM|wxRIGHT" />
+                  <node
+                    class="wxTextCtrl"
+                    style="wxTE_READONLY"
+                    var_name="input_device_name"
+                    borders="wxBOTTOM|wxRIGHT"
+                    flags="wxEXPAND" />
+                </node>
+                <node
+                  class="wxButton"
+                  label="Show full response"
+                  var_name="button_schema_response"
+                  disabled="1"
+                  alignment="wxALIGN_BOTTOM"
+                  borders="wxTOP|wxBOTTOM|wxRIGHT" />
+              </node>
+            </node>
+          </node>
         </node>
       </node>
     </node>
