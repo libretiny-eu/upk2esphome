@@ -1,6 +1,7 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-9-4.
 
 from upk2esphome.config import ConfigData
+from upk2esphome.datapoints import Datapoint, convert_all
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
@@ -57,10 +58,9 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
 
     # mark 'found' only if supported DP component was processed
     yr.found = False
+    dps: list[Datapoint] = []
     for service in services:
         for dp_data in service.get("properties", []):
-            add_dp(yr, config, opts, dp_data)
+            dps.append(Datapoint.build(dp_data))
 
-
-def add_dp(yr: YamlResult, config: ConfigData, opts: Opts, dp_data: dict):
-    pass
+    convert_all(yr, config, opts, dps)

@@ -1,0 +1,28 @@
+{
+	"℃": "°C",
+	"lux": "lx",
+	"temp_current": {
+		"name": "Temperature",
+		"device_class": "temperature"
+	},
+	"humidity_value": {
+		"name": "Humidity",
+		"device_class": "humidity"
+	},
+	"temp_unit_convert": {
+		"name": "Unit Conversion",
+		"entity_category": "config"
+	},
+	"temp_sampling": {
+		"name": "Temperature Sampling Interval",
+		"entity_category": "config"
+	},
+	"humidity_sampling": {
+		"name": "Humidity Sampling Interval",
+		"entity_category": "config"
+	},
+	"bright_value": {
+		"name": "Luminance",
+		"device_class": "illuminance"
+	}
+}

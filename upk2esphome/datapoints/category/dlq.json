@@ -1,0 +1,8 @@
+{
+	"switch": {
+		"name": "Circuit Breaker On/Off"
+	},
+	"switch_prepayment": {
+		"name": "Prepayment Function"
+	}
+}

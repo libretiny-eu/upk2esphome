@@ -1,0 +1,13 @@
+{
+	"middle": "medium",
+	"battery_state": {
+		"name": "Battery Level"
+	},
+	"battery_percentage": {
+		"name": "Battery Level",
+		"device_class": "battery"
+	},
+	"tamper_alarm": {
+		"name": "Tamper Alarm"
+	}
+}

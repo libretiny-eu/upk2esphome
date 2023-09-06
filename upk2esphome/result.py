@@ -33,7 +33,7 @@ class YamlResult:
     @property
     def text(self) -> str:
         text = yaml.dump(self.data, sort_keys=False, Dumper=MyDumper)
-        text = re.sub(r"'!secret ([\w_]+)'", r"!secret \1", text)
+        text = re.sub(r"'!(\w+) (.+)'", r"!\1 \2", text)
         text = re.sub(r"\n([a-z])", r"\n\n\1", text)
         text = text.replace("'", '"')
         text = re.sub(r'_\d+: "(.+?)"', r"# \1", text)
@@ -89,3 +89,22 @@ class YamlResult:
         if "button" not in self.data:
             self.data["button"] = []
         self.data["button"].append(data)
+
+    def number(self, data: dict):
+        if "number" not in self.data:
+            self.data["number"] = []
+        self.data["number"].append(data)
+
+    def select(self, data: dict):
+        if "select" not in self.data:
+            self.data["select"] = []
+        self.data["select"].append(data)
+
+    def tuya_on_datapoint_update(self, data: dict):
+        if "tuya" not in self.data:
+            self.data["tuya"] = tuya = {}
+        else:
+            tuya = self.data["tuya"]
+        if "on_datapoint_update" not in tuya:
+            tuya["on_datapoint_update"] = []
+        tuya["on_datapoint_update"].append(data)

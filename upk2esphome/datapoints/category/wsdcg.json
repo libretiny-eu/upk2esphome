@@ -1,0 +1,22 @@
+{
+	"maxtemp_set": {
+		"name": "Temperature Upper Limit",
+		"entity_category": "config",
+		"device_class": "temperature"
+	},
+	"minitemp_set": {
+		"name": "Temperature Lower Limit",
+		"entity_category": "config",
+		"device_class": "temperature"
+	},
+	"maxhum_set": {
+		"name": "Humidity Upper Limit",
+		"entity_category": "config",
+		"device_class": "humidity"
+	},
+	"minihum_set": {
+		"name": "Humidity Lower Limit",
+		"entity_category": "config",
+		"device_class": "humidity"
+	}
+}

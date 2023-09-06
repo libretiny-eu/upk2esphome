@@ -1,0 +1,17 @@
+{
+	"total_forward_energy": {
+		"name": "Total Forward Active Energy",
+		"device_class": "energy",
+		"state_class": "total_increasing"
+	},
+	"clear_energy": {
+		"name": "Clear Energy Data",
+		"entity_category": "config"
+	},
+	"balance_energy": {
+		"name": "Remaining Available Energy Display"
+	},
+	"leakage_current": {
+		"name": "Leakage Current"
+	}
+}
