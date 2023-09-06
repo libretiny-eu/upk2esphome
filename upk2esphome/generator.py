@@ -97,6 +97,7 @@ def upk2esphome(
             "- it uses TuyaMCU (report error if that's the case!)\n\n"
             "Auto-generating ESPHome YAML is not possible."
         )
+        yr.data = {}
 
     if not yr.found and not yr.errors:
         yr.error(

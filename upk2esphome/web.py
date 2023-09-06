@@ -21,16 +21,20 @@ def on_run_click():
         opts[el_id[5:]] = el_value
     opts = Opts(**opts)
 
+    def fix_br(s: str) -> str:
+        return s.replace("\n", "<br>")
+
     input_data = jQuery("#input").val()
     yr = upk2esphome(input_data, opts)
     jQuery("#output").val(yr.text)
     jQuery("#logs").html("<pre>" + "<br>".join(yr.logs) + "</pre>")
     jQuery("#warnings").html(
         "".join(
-            f'<div class="alert alert-danger" role="alert">{e}</div>' for e in yr.errors
+            f'<div class="alert alert-danger" role="alert">{fix_br(e)}</div>'
+            for e in yr.errors
         )
         + "".join(
-            f'<div class="alert alert-warning" role="alert">{w}</div>'
+            f'<div class="alert alert-warning" role="alert">{fix_br(w)}</div>'
             for w in yr.warnings
         )
     )

@@ -160,7 +160,7 @@ def firmware(file: click.File, output: click.File, **kwargs):
     work.start()
 
 
-def write_upk(data: dict, output: click.File, storage_only: bool, **kwargs):
+def write_upk(data: dict, output: click.File, storage_only: bool = False, **kwargs):
     if storage_only:
         text = json.dumps(data, indent="\t")
     else:
