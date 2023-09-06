@@ -59,6 +59,10 @@ class ConfigData:
         return self.extras.get("model", {})
 
     @property
+    def category(self) -> str | None:
+        return self.extras.get("category", {})
+
+    @property
     def profile_slug(self) -> str:
         profiles = self.data.get("profiles", [])
         profile = profiles and profiles[0] or {}

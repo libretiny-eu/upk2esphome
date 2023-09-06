@@ -178,6 +178,9 @@ class UpkPanel(BasePanel, ZeroconfBase):
         if not yr.errors:
             # navigate to Options page if successful
             self.Notebook.SetSelection(1)
+        else:
+            # else go back to Start page
+            self.Notebook.SetSelection(0)
 
         if not self.logs_shown:
             # show errors only once, then allow to change generation options
@@ -417,12 +420,14 @@ class UpkPanel(BasePanel, ZeroconfBase):
             device=self.schema_device,
             software=(
                 self.last_result
+                and self.last_result.needs_tuyamcu_model
                 and self.last_result.config
                 and self.last_result.config.data_software
             ),
             license_=self.schema_license,
             schema_id=(
                 self.last_result
+                and self.last_result.needs_tuyamcu_model
                 and self.last_result.config
                 and self.last_result.config.schema_id
             ),
@@ -457,7 +462,8 @@ class UpkPanel(BasePanel, ZeroconfBase):
     def data(self, value: dict | None) -> None:
         text = value and json.dumps(value, indent=4) or ""
         self.TextData.ChangeValue(text or "")
-        self.TextExtras.ChangeValue("")
+        # invalidate schema response and extras
+        self.schema_response = None
         self.DoUpdate(self.TextData)
 
     @property
@@ -498,7 +504,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
         page.Layout()
         page.Update()
         # for now, only allow pulling schema for TuyaMCU devices
-        page.Enable(is_guided)
+        page.Enable(True)
 
     @property
     def schema_device(self) -> dict:
@@ -535,6 +541,11 @@ class UpkPanel(BasePanel, ZeroconfBase):
     @schema_response.setter
     def schema_response(self, value: dict | None) -> None:
         self._schema_response = value
+        if not value:
+            self.SchemaDeviceCategory.ChangeValue("")
+            self.SchemaDeviceName.ChangeValue("")
+            self.TextExtras.ChangeValue("")
+            return
         debug(f"Received schema response ({type(value).__name__})")
 
         active_response = value.get("activeResponse", {})
@@ -567,5 +578,6 @@ class UpkPanel(BasePanel, ZeroconfBase):
                 style=wx.ICON_INFORMATION,
             )
             self.extras = dict(
+                category=category,
                 model=model,
             )
