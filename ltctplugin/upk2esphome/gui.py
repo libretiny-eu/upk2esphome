@@ -14,20 +14,19 @@ from ltchiptool.gui.utils import on_event
 from ltchiptool.util.logging import LoggingHandler
 from zeroconf import IPVersion, ServiceInfo
 
-from upk2esphome import Opts, generate_yaml
+from upk2esphome import Opts, YamlResult, upk2esphome
+from upk2esphome.const import (
+    DISCLAIMER_TEXT,
+    MESSAGE_FETCHED_SCHEMA_MODEL,
+    MESSAGE_SCHEMA_INCORRECT_MODEL,
+    MESSAGE_SCHEMA_MISSING_MODEL,
+    MESSAGE_TUYAMCU,
+)
 
 from .common import cloudcutter_get_device, cloudcutter_list_devices
 from .work import UpkThread
+from .work_schema import UpkSchemaThread
 
-DISCLAIMER_TEXT = """
-While the author has taken care to write the converter as well as possible, keep in mind that this might not be 100% accurate!
-
-There may be some errors, such as missing components (unsupported types) or incorrect readings.
-
-This serves mostly as a kickstart config, rather than a production-ready file. Make sure to review the output before uploading it to the device.
-
-**We do not take responsibility for using this tool and the generated configs.**
-"""
 ZEROCONF_SERVICE = "_esphomelib._tcp.local."
 
 
@@ -38,6 +37,8 @@ class UpkPanel(BasePanel, ZeroconfBase):
     logs_shown: bool = False
     disclaimer_shown: bool = False
     kickstart_devices: dict[str, str] = None
+    _result: YamlResult | None = None
+    _schema_response: dict | None = None
 
     def __init__(self, parent: wx.Window, frame):
         super().__init__(parent, frame)
@@ -72,8 +73,35 @@ class UpkPanel(BasePanel, ZeroconfBase):
         self.BindButton("button_esphome_copy", self.OnEsphomeCopyClick)
 
         self.TextEsphome = self.BindTextCtrl("input_esphome")
-        self.TextUpk = self.BindTextCtrl("input_upk")
-        self.TextStorage = self.BindTextCtrl("input_storage")
+        self.TextData = self.BindTextCtrl("input_source_data")
+        self.TextExtras = self.BindTextCtrl("input_source_extras")
+        self.LabelData = self.FindStaticText("text_source_data")
+        self.LabelExtras = self.FindStaticText("text_source_extras")
+
+        self.LabelsGuided = [
+            self.FindStaticText("text_guided_1"),
+            self.FindStaticText("text_guided_2"),
+        ]
+        self.SchemaInputsDevice: dict[str, wx.TextCtrl] = {
+            "firmwareKey": self.FindWindowByName("input_firmware_key", self),
+            "productKey": self.FindWindowByName("input_product_key", self),
+            "factoryPin": self.FindWindowByName("input_factory_pin", self),
+            "softwareVer": self.FindWindowByName("input_software_ver", self),
+        }
+        self.SchemaInputsLicense: dict[str, wx.TextCtrl] = {
+            "uuid": self.FindWindowByName("input_uuid", self),
+            "authKey": self.FindWindowByName("input_auth_key", self),
+        }
+        self.BindButton("button_schema_download", self.OnSchemaDownloadClick)
+        self.SchemaDeviceCategory = self.FindWindowByName("input_device_category", self)
+        self.SchemaDeviceName = self.FindWindowByName("input_device_name", self)
+        self.ButtonSchemaResponse = self.BindButton(
+            "button_schema_response", self.OnSchemaResponseClick
+        )
+        self.BindWindow(
+            "collapsible_schema",
+            (wx.EVT_COLLAPSIBLEPANE_CHANGED, self.OnSchemaCollapsibleClick),
+        )
 
         self.EnableFileDrop()
 
@@ -86,6 +114,8 @@ class UpkPanel(BasePanel, ZeroconfBase):
             if key not in self.Opts:
                 continue
             self.Opts[key].ChangeValue(getattr(default_opts, key))
+
+        self.last_result = None
 
     def GetSettings(self) -> dict:
         return dict(
@@ -123,13 +153,14 @@ class UpkPanel(BasePanel, ZeroconfBase):
     def OnUpdate(self, target: wx.Window = None):
         if target is None:
             return
-        debug(f"OnUpdate, target: {type(target)}, upk: {self.upk}")
-        upk = self.upk
-        if not upk:
+        debug(f"OnUpdate, target: {type(target)}")
+        data = self.data
+        if not data:
             self.TextEsphome.Clear()
             self.logs_shown = False
             return
-        if target == self.TextUpk:
+        if target == self.TextData or target == self.TextExtras:
+            # show error logs again after changing input data
             self.logs_shown = False
 
         if not self.disclaimer_shown:
@@ -141,36 +172,82 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.disclaimer_shown = True
 
         opts = Opts(**self.GetSettings()["opts"])
-        yr = generate_yaml(upk, opts)
-        self.TextEsphome.ChangeValue(yr.text)
+        yr = upk2esphome(raw_data=data, opts=opts, raw_extras=self.extras)
+        # update UI according to the generation result
+        self.last_result = yr
+        if not yr.errors:
+            # navigate to Options page if successful
+            self.Notebook.SetSelection(1)
+        else:
+            # else go back to Start page
+            self.Notebook.SetSelection(0)
 
         if not self.logs_shown:
+            # show errors only once, then allow to change generation options
             self.logs_shown = True
+            # print messages to logger
             for line in yr.errors:
-                error(line)
+                error(f"UPK: {line}")
+            for line in yr.warnings:
+                warning(f"UPK: {line}")
+            for line in yr.logs:
+                info(f"UPK: {line}")
+            # ask about downloading device schema
+            if yr.needs_tuyamcu_model:
+                if self.extras:
+                    # warn when extras filled but model still needed
+                    wx.MessageBox(
+                        message=MESSAGE_SCHEMA_INCORRECT_MODEL.strip(),
+                        caption="Warning",
+                        style=wx.ICON_WARNING,
+                    )
+                else:
+                    # otherwise ask the user to fill extras
+                    dialog = wx.MessageDialog(
+                        self,
+                        message=MESSAGE_TUYAMCU.strip(),
+                        caption="Found TuyaMCU device",
+                        style=wx.ICON_INFORMATION | wx.OK | wx.CANCEL,
+                    )
+                    selection = dialog.ShowModal()
+                    dialog.Destroy()
+                    if selection == wx.ID_OK:
+                        self.Notebook.SetSelection(4)
+                        return
+            # show other errors and warnings
             if yr.errors:
                 wx.MessageBox(
-                    message="While generating YAML:\n\n" + "\n".join(yr.errors),
+                    message="\n".join(yr.errors),
                     caption="Error",
                     style=wx.ICON_ERROR,
                 )
-            for line in yr.warnings:
-                warning(line)
-            if yr.warnings:
+            elif yr.warnings:
+                message = "\n".join(f"{i + 1}. {s}" for i, s in enumerate(yr.warnings))
                 wx.MessageBox(
-                    message="While generating YAML:\n\n" + "\n".join(yr.warnings),
+                    message="While generating YAML:\n\n" + message,
                     caption="Warning",
                     style=wx.ICON_WARNING,
                 )
-            for line in yr.logs:
-                info(f"UPK: {line}")
 
     def OnStorageData(self, storage: dict):
-        self.storage = storage
+        self.data = storage
         self.DoUpdate()
 
     def OnStorageError(self, error_text: str):
-        self.storage = None
+        self.data = None
+        self.DoUpdate()
+        wx.MessageBox(
+            message=error_text,
+            caption="Error",
+            style=wx.ICON_ERROR,
+        )
+
+    def OnSchemaResponse(self, response: dict):
+        self.schema_response = response
+        self.DoUpdate()
+
+    def OnSchemaError(self, error_text: str):
+        self.schema_response = None
         self.DoUpdate()
         wx.MessageBox(
             message=error_text,
@@ -303,8 +380,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
             LoggingHandler.get().emit_exception(e)
             return
 
-        self.storage = None
-        self.upk = device.get("device_configuration", {})
+        self.data = device
 
     @on_event
     def OnDoDumpClick(self):
@@ -338,47 +414,170 @@ class UpkPanel(BasePanel, ZeroconfBase):
             wx.TheClipboard.Flush()
             self.TextEsphome.SelectAll()
 
+    @on_event
+    def OnSchemaDownloadClick(self):
+        work = UpkSchemaThread(
+            device=self.schema_device,
+            software=(
+                self.last_result
+                and self.last_result.needs_tuyamcu_model
+                and self.last_result.config
+                and self.last_result.config.data_software
+            ),
+            license_=self.schema_license,
+            schema_id=(
+                self.last_result
+                and self.last_result.needs_tuyamcu_model
+                and self.last_result.config
+                and self.last_result.config.schema_id
+            ),
+            on_success=self.OnSchemaResponse,
+            on_error=self.OnSchemaError,
+        )
+        self.StartWork(work)
+
+    @on_event
+    def OnSchemaResponseClick(self):
+        if not self.schema_response:
+            self.ButtonSchemaResponse.Enable(False)
+            return
+        wx.MessageBox(
+            message=json.dumps(self.schema_response, indent=4),
+            caption="Schema API response",
+            style=wx.ICON_INFORMATION,
+        )
+
+    @on_event
+    def OnSchemaCollapsibleClick(self):
+        page: wx.NotebookPage = self.Notebook.GetPage(4)
+        page.Layout()
+        page.Update()
+
     @property
-    def upk(self):
-        text = self.TextUpk.GetValue() or None
+    def data(self) -> dict | None:
+        text = self.TextData.GetValue() or None
         return text and json.loads(text)
 
-    @upk.setter
-    def upk(self, value: dict | None):
+    @data.setter
+    def data(self, value: dict | None) -> None:
         text = value and json.dumps(value, indent=4) or ""
-        self.TextUpk.ChangeValue(text)
-        if value:
-            # valid UPK, go to options page
-            self.Notebook.SetSelection(1)
-        elif value is not None:
-            # empty UPK == no UPK in storage
+        self.TextData.ChangeValue(text or "")
+        # invalidate schema response and extras
+        self.schema_response = None
+        self.DoUpdate(self.TextData)
+
+    @property
+    def extras(self) -> dict | None:
+        text = self.TextExtras.GetValue() or None
+        return text and json.loads(text)
+
+    @extras.setter
+    def extras(self, value: dict | None) -> None:
+        text = value and json.dumps(value, indent=4) or ""
+        self.TextExtras.ChangeValue(text or "")
+        self.DoUpdate(self.TextExtras)
+
+    @property
+    def last_result(self) -> YamlResult | None:
+        return self._result
+
+    @last_result.setter
+    def last_result(self, value: YamlResult | None) -> None:
+        self._result = yr = value
+        config = yr and yr.config
+
+        is_valid = yr and not yr.errors or False
+        is_guided = is_valid and yr.needs_tuyamcu_model
+        self.Notebook.GetPage(1).Enable(is_valid)
+        self.Notebook.GetPage(2).Enable(is_valid)
+        self.TextEsphome.ChangeValue(is_valid and yr.text or "")
+
+        self.schema_device = config and config.data_device
+        self.schema_license = config and config.data_license
+
+        for label in self.LabelsGuided:
+            label.Show(is_guided)
+        for input in self.SchemaInputsDevice.values():
+            input.Enable(not is_guided)
+
+        page: wx.NotebookPage = self.Notebook.GetPage(4)
+        page.Layout()
+        page.Update()
+        # for now, only allow pulling schema for TuyaMCU devices
+        page.Enable(True)
+
+    @property
+    def schema_device(self) -> dict:
+        value = {}
+        for key, input in self.SchemaInputsDevice.items():
+            value[key] = input.GetValue() or None
+        return value
+
+    @schema_device.setter
+    def schema_device(self, value: dict | None) -> None:
+        value = value or {}
+        for key, input in self.SchemaInputsDevice.items():
+            text = value.get(key, None)
+            input.ChangeValue(text or "")
+
+    @property
+    def schema_license(self) -> dict:
+        value = {}
+        for key, input in self.SchemaInputsLicense.items():
+            value[key] = input.GetValue() or None
+        return value
+
+    @schema_license.setter
+    def schema_license(self, value: dict | None) -> None:
+        value = value or {}
+        for key, input in self.SchemaInputsLicense.items():
+            text = value.get(key, None)
+            input.ChangeValue(text or "")
+
+    @property
+    def schema_response(self) -> dict | None:
+        return self._schema_response
+
+    @schema_response.setter
+    def schema_response(self, value: dict | None) -> None:
+        self._schema_response = value
+        if not value:
+            self.SchemaDeviceCategory.ChangeValue("")
+            self.SchemaDeviceName.ChangeValue("")
+            self.TextExtras.ChangeValue("")
+            return
+        debug(f"Received schema response ({type(value).__name__})")
+
+        active_response = value.get("activeResponse", {})
+        model_response = value.get("modelResponse", {})
+        details_response = value.get("detailsResponse", {})
+
+        model = model_response.get("model", {})
+        model_id = model.get("modelId", None)
+        schema_id = model_id or active_response.get("schemaId", None)
+        category_name = details_response.get("category_name", "Unknown")
+        category = details_response.get("category", "unk")
+        name = details_response.get("model", "Device")
+
+        self.SchemaDeviceCategory.ChangeValue(f"{category_name} ({category})")
+        self.SchemaDeviceName.ChangeValue(f"{name} - schema ID: {schema_id}")
+
+        if not model:
             wx.MessageBox(
-                message=(
-                    "This device doesn't contain user_param_key config. "
-                    "Possible causes:\n"
-                    "- it has custom/non-generic firmware\n"
-                    "- it uses TuyaMCU\n\n"
-                    "Auto-generating ESPHome YAML is not possible."
-                ),
-                caption="Missing configuration",
-                style=wx.ICON_WARNING,
+                message=MESSAGE_SCHEMA_MISSING_MODEL.strip(),
+                caption="Error",
+                style=wx.ICON_ERROR,
             )
-        # else: UPK is None, so we're clearing the state
-        self.DoUpdate(self.TextUpk)
+            return
 
-    @property
-    def storage(self):
-        text = self.TextStorage.GetValue() or None
-        return text and json.loads(text)
-
-    @storage.setter
-    def storage(self, value: dict | None):
-        text = value and json.dumps(value, indent=4) or ""
-        self.TextStorage.ChangeValue(text)
-        if value is None:
-            # clear UPK along with storage
-            self.upk = None
-        else:
-            # set UPK if present, or set empty if not
-            self.upk = value.get("user_param_key", {})
-        self.DoUpdate(self.TextStorage)
+        yr = self.last_result
+        if yr and yr.needs_tuyamcu_model:
+            wx.MessageBox(
+                message=MESSAGE_FETCHED_SCHEMA_MODEL.strip(),
+                caption="Success",
+                style=wx.ICON_INFORMATION,
+            )
+            self.extras = dict(
+                category=category,
+                model=model,
+            )

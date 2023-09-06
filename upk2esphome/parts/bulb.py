@@ -1,5 +1,6 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-21.
 
+from upk2esphome.config import ConfigData
 from upk2esphome.generator import invert
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
@@ -239,7 +240,8 @@ def gen_i2c_bp1658cj(yr: YamlResult, config: dict):
     return found
 
 
-def generate(yr: YamlResult, config: dict, opts: Opts):
+def generate(yr: YamlResult, config: ConfigData, opts: Opts):
+    config = config.upk or {}
     # remove duplicate channels
     if config.get("iicc", None) == config.get("iicw", None):
         config.pop("iicw", None)
