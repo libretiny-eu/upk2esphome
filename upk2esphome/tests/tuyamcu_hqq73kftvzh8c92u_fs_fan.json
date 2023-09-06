@@ -1,0 +1,107 @@
+{
+	"category": "fs",
+	"model": {
+		"modelId": "0000003niz",
+		"services": [
+			{
+				"actions": [],
+				"code": "",
+				"description": "",
+				"events": [],
+				"name": "默认服务",
+				"properties": [
+					{
+						"abilityId": 1,
+						"accessMode": "rw",
+						"code": "switch",
+						"description": "【必选】",
+						"extensions": {
+							"iconName": "icon-power"
+						},
+						"name": "开关",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 3,
+						"accessMode": "rw",
+						"code": "fan_speed",
+						"description": "【必选】可根据实际档位需求扩展",
+						"extensions": {
+							"iconName": "icon-a_fan_low"
+						},
+						"name": "风速",
+						"typeSpec": {
+							"range": [
+								"1",
+								"2",
+								"3"
+							],
+							"type": "enum",
+							"typeDefaultValue": "1"
+						}
+					},
+					{
+						"abilityId": 6,
+						"accessMode": "rw",
+						"code": "countdown",
+						"description": "0：取消\n1：1小时\n2：2小时\n.....",
+						"extensions": {
+							"iconName": "icon-dp_time2"
+						},
+						"name": "倒计时",
+						"typeSpec": {
+							"range": [
+								"0",
+								"1",
+								"2",
+								"3",
+								"4",
+								"5",
+								"6"
+							],
+							"type": "enum",
+							"typeDefaultValue": "0"
+						}
+					},
+					{
+						"abilityId": 7,
+						"accessMode": "ro",
+						"code": "countdown_left",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_time3"
+						},
+						"name": "倒计时剩余时间",
+						"typeSpec": {
+							"max": 360,
+							"min": 0,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "分钟"
+						}
+					},
+					{
+						"abilityId": 9,
+						"accessMode": "rw",
+						"code": "light",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-tcl_function_light",
+							"attribute": "16"
+						},
+						"name": "灯光",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					}
+				]
+			}
+		]
+	}
+}

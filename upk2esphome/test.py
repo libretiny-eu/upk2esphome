@@ -1,9 +1,10 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-4-22.
 
 if __name__ == "__main__":
+    import json
     import sys
     from glob import glob
-    from os.path import dirname, join
+    from os.path import dirname, isfile, join
 
     from .generator import upk2esphome
     from .opts import Opts
@@ -25,7 +26,14 @@ if __name__ == "__main__":
         with open(file, "r") as f:
             d = f.read().strip()
         print(file)
-        yr = upk2esphome(d, opts)
+        extras_file = file.replace(".txt", ".json")
+        if isfile(extras_file):
+            print(extras_file)
+            with open(extras_file, "r", encoding="utf-8") as f:
+                extras = json.load(f)
+        else:
+            extras = None
+        yr = upk2esphome(d, opts, extras)
         print("\n".join(f"I: {s}" for s in yr.logs))
         print("\n".join(f"W: {s}" for s in yr.warnings))
         print("\n".join(f"E: {s}" for s in yr.errors))

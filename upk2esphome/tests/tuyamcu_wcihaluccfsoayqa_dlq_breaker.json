@@ -1,0 +1,278 @@
+{
+	"category": "dlq",
+	"model": {
+		"modelId": "000004pxun",
+		"services": [
+			{
+				"actions": [],
+				"code": "",
+				"description": "",
+				"events": [],
+				"name": "默认服务",
+				"properties": [
+					{
+						"abilityId": 1,
+						"accessMode": "ro",
+						"code": "total_forward_energy",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_lightning",
+							"attribute": "1152"
+						},
+						"name": "正向总有功电量",
+						"typeSpec": {
+							"max": 99999999,
+							"min": 0,
+							"scale": 2,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "kW·h"
+						}
+					},
+					{
+						"abilityId": 6,
+						"accessMode": "ro",
+						"code": "phase_a",
+						"description": "1，A相电压，电流及功率\\n2，大端模式，HEX格式，共8个字节\\n3，单位精度：电压，2字节，单位0.1V。电流，3字节，单位 0.001A 。A相有功功率，3字节，单位0.0001kW\\n4，报文格式\\n举例：08 80 00 03 E8 00 27 10 表示A相217.6V，A相电流1.000A，A相功率10.000KW\\n5，通信逻辑：\\n1）用户进面板，主动查询。用户进入面板，面板马上下发0x08到电表，电表上报数据到云平台，面板拿到数据，然后展示。 注：最新WIFI支持。   \\n2）电表基于一定周期上报数据。建议：在WIFI模式时，15秒上报一次。NB模式时，1个小时上报一次。",
+						"extensions": {
+							"iconName": "icon-dp_lightning",
+							"attribute": "1152"
+						},
+						"name": "A相电压，电流及功率",
+						"typeSpec": {
+							"maxlen": 128,
+							"type": "raw"
+						}
+					},
+					{
+						"abilityId": 9,
+						"accessMode": "ro",
+						"code": "fault",
+						"description": "1，告警\\n2，大端模式，HEX,4字节\\n3，报文格式\\n按照完整4个字节,对应的告警位上报告警；bit位，1表示有告警，0表示无告警；如果没用的告警位，补0。高位无定义，也补0；\\n举例：0X00 00 00 09,表示当前发生了漏电自检不正常告警和短路告警,无其它告警。\\n4，通信逻辑\\n只要有1个告警发生，就完整4个字节上报给面板；只要有1个告警关闭，就完整4个字节上报给面板，更新面板显示。",
+						"extensions": {
+							"iconName": "icon-baojing",
+							"attribute": "1152"
+						},
+						"name": "故障告警",
+						"typeSpec": {
+							"label": [
+								"short_circuit_alarm",
+								"surge_alarm",
+								"overload_alarm",
+								"leakagecurr_alarm",
+								"temp_dif_fault",
+								"fire_alarm",
+								"high_power_alarm",
+								"self_test_alarm",
+								"ov_cr",
+								"unbalance_alarm",
+								"ov_vol",
+								"undervoltage_alarm",
+								"miss_phase_alarm",
+								"outage_alarm",
+								"magnetism_alarm",
+								"credit_alarm",
+								"no_balance_alarm"
+							],
+							"maxlen": 17,
+							"type": "bitmap",
+							"typeDefaultValue": 0
+						}
+					},
+					{
+						"abilityId": 11,
+						"accessMode": "rw",
+						"code": "switch_prepayment",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_money",
+							"attribute": "1152"
+						},
+						"name": "预付费功能开关",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 12,
+						"accessMode": "rw",
+						"code": "clear_energy",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_lightning",
+							"attribute": "1152"
+						},
+						"name": "电量清零",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 13,
+						"accessMode": "ro",
+						"code": "balance_energy",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_lightning",
+							"attribute": "1152"
+						},
+						"name": "剩余可用电量",
+						"typeSpec": {
+							"max": 99999999,
+							"min": 0,
+							"scale": 2,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "kW·h"
+						}
+					},
+					{
+						"abilityId": 14,
+						"accessMode": "rw",
+						"code": "charge_energy",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_money",
+							"attribute": "1152"
+						},
+						"name": "电量充值",
+						"typeSpec": {
+							"max": 999999,
+							"min": 0,
+							"scale": 2,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "kW·h"
+						}
+					},
+					{
+						"abilityId": 15,
+						"accessMode": "ro",
+						"code": "leakage_current",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-power1",
+							"attribute": "1152"
+						},
+						"name": "剩余电流",
+						"typeSpec": {
+							"max": 1000,
+							"min": 0,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "mA"
+						}
+					},
+					{
+						"abilityId": 16,
+						"accessMode": "rw",
+						"code": "switch",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_power2",
+							"attribute": "1152"
+						},
+						"name": "断路器拉合闸",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 17,
+						"accessMode": "rw",
+						"code": "alarm_set_1",
+						"description": "1，告警阈值使能控制及设置2  \\n2，HEX格式，大端模式, 总告警的数量*4字节= 设置告警总长度。\\n3，报文格式\\n每个告警由4个字节组成，第1个字节（表示该告警存在）；第2个字节（发生此告警时，断路器控制模式（0X01拉闸，0X00不动作只告警）；第3、4字节：设置告警阈值\\n举例：0X01 01 00 00 03 01 00 14,表示该断路器支持短路告警，发生该告警时，自动跳闸，阀值补0。支持过载告警，发生该告警时，拉闸动作，动作阀值20KW。无其它告警。\\n4，通信逻辑\\nA，配网成功后，按照上面的格式，主动上报给云平台，面板知道哪些告警是断路器当前支持的。设置不成功，重新配网再上报。\\nB，断路器上电时，也上报一次。\\nC，面板根据协议下发告警设置。",
+						"extensions": {
+							"iconName": "icon-dp_warming",
+							"attribute": "1152"
+						},
+						"name": "告警设置1",
+						"typeSpec": {
+							"maxlen": 128,
+							"type": "raw"
+						}
+					},
+					{
+						"abilityId": 18,
+						"accessMode": "rw",
+						"code": "alarm_set_2",
+						"description": "1，告警阈值使能控制及设置2  \\n2，HEX格式，大端模式\\n3，报文格式\\n每个告警由4个字节组成，第1个字节（表示该告警存在）；第2个字节（发生此告警时，断路器控制模式（0X01拉闸，0X00不动作只告警）；第3、4字节：设置告警阈值\\n举例：0X01 01 00 3C 03 01 00 F5,表示该断路器支持过流告警，发生该告警时，拉闸动作，动作阀值60A。支持过压告警，发生该告警时，拉闸动作，动作阀值245V\\n4，通信逻辑\\nA，配网成功后，按照上面的格式，主动上报给云平台，面板知道哪些告警是断路器当前支持的。设置不成功，重新配网再上报。\\nB，断路器上电时，也上报一次。\\nC，面板根据协议下发告警设置。",
+						"extensions": {
+							"iconName": "icon-dp_warming",
+							"attribute": "1152"
+						},
+						"name": "告警设置2",
+						"typeSpec": {
+							"maxlen": 128,
+							"type": "raw"
+						}
+					},
+					{
+						"abilityId": 19,
+						"accessMode": "ro",
+						"code": "breaker_id",
+						"description": "1，设备号\\n2，大端模式，字符串型\\n3，单位精度\\n4，报文格式\\n5，通信逻辑\\nA，配网时上报三次，以确保上报成功。如果配对成功，面板有显示设备号。\\nB，如果配对成功，面板没有显示设备号，需要移除设备，再配置一遍。\\nC，每次断路器上电，也上报一次。",
+						"extensions": {
+							"iconName": "icon-dp_mode",
+							"attribute": "1152"
+						},
+						"name": "设备号显示",
+						"typeSpec": {
+							"maxlen": 255,
+							"type": "string",
+							"typeDefaultValue": ""
+						}
+					},
+					{
+						"abilityId": 104,
+						"accessMode": "rw",
+						"code": "over_vol_protect_time",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_time3",
+							"attribute": "4096"
+						},
+						"name": "过欠压动作保护时间",
+						"typeSpec": {
+							"max": 30,
+							"min": 1,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 1,
+							"unit": "sec"
+						}
+					},
+					{
+						"abilityId": 105,
+						"accessMode": "rw",
+						"code": "over_vol_recovery_time",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_time3",
+							"attribute": "4096"
+						},
+						"name": "过欠压保护恢复时间",
+						"typeSpec": {
+							"max": 500,
+							"min": 1,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 1,
+							"unit": "sec"
+						}
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,290 @@
+{
+	"category": "wk",
+	"model": {
+		"modelId": "00000045od",
+		"services": [
+			{
+				"actions": [],
+				"code": "",
+				"description": "",
+				"events": [],
+				"name": "默认服务",
+				"properties": [
+					{
+						"abilityId": 1,
+						"accessMode": "rw",
+						"code": "switch",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_power3"
+						},
+						"name": "开关",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 2,
+						"accessMode": "rw",
+						"code": "mode",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_mode"
+						},
+						"name": "工作模式",
+						"typeSpec": {
+							"range": [
+								"auto",
+								"manual"
+							],
+							"type": "enum",
+							"typeDefaultValue": "auto"
+						}
+					},
+					{
+						"abilityId": 10,
+						"accessMode": "rw",
+						"code": "frost",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-chushuang"
+						},
+						"name": "防霜冻功能",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 16,
+						"accessMode": "rw",
+						"code": "temp_set",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_temp"
+						},
+						"name": "目标温度",
+						"typeSpec": {
+							"max": 90,
+							"min": 5,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 5,
+							"unit": "℃"
+						}
+					},
+					{
+						"abilityId": 19,
+						"accessMode": "rw",
+						"code": "upper_temp",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_f"
+						},
+						"name": "设置温度上限",
+						"typeSpec": {
+							"max": 90,
+							"min": 30,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 30,
+							"unit": "℃"
+						}
+					},
+					{
+						"abilityId": 24,
+						"accessMode": "ro",
+						"code": "temp_current",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-wendu"
+						},
+						"name": "当前温度",
+						"typeSpec": {
+							"max": 900,
+							"min": 0,
+							"scale": 1,
+							"step": 5,
+							"type": "value",
+							"typeDefaultValue": 0,
+							"unit": "℃"
+						}
+					},
+					{
+						"abilityId": 26,
+						"accessMode": "rw",
+						"code": "lower_temp",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_c"
+						},
+						"name": "设置温度下限",
+						"typeSpec": {
+							"max": 20,
+							"min": 5,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 5,
+							"unit": "℃"
+						}
+					},
+					{
+						"abilityId": 27,
+						"accessMode": "rw",
+						"code": "temp_correction",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-wendu1"
+						},
+						"name": "温度校准",
+						"typeSpec": {
+							"max": 9,
+							"min": -9,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": -9,
+							"unit": "摄氏度"
+						}
+					},
+					{
+						"abilityId": 36,
+						"accessMode": "ro",
+						"code": "valve_state",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-tcl_function_vs2"
+						},
+						"name": "阀门状态",
+						"typeSpec": {
+							"range": [
+								"open",
+								"close"
+							],
+							"type": "enum",
+							"typeDefaultValue": "open"
+						}
+					},
+					{
+						"abilityId": 38,
+						"accessMode": "rw",
+						"code": "week_program1",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-icon-test7"
+						},
+						"name": "周编程（自由式）",
+						"typeSpec": {
+							"maxlen": 128,
+							"type": "raw"
+						}
+					},
+					{
+						"abilityId": 39,
+						"accessMode": "rw",
+						"code": "factory_reset",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-icon-test12"
+						},
+						"name": "恢复出厂设置",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 40,
+						"accessMode": "rw",
+						"code": "child_lock",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_lock"
+						},
+						"name": "童锁开关",
+						"typeSpec": {
+							"type": "bool",
+							"typeDefaultValue": false
+						}
+					},
+					{
+						"abilityId": 43,
+						"accessMode": "rw",
+						"code": "sensor_choose",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-gongneng"
+						},
+						"name": "传感器选择",
+						"typeSpec": {
+							"range": [
+								"in",
+								"out",
+								"all"
+							],
+							"type": "enum",
+							"typeDefaultValue": "in"
+						}
+					},
+					{
+						"abilityId": 45,
+						"accessMode": "ro",
+						"code": "fault",
+						"description": "",
+						"extensions": {
+							"iconName": "icon-dp_notice"
+						},
+						"name": "故障告警",
+						"typeSpec": {
+							"label": [
+								"e1",
+								"e2",
+								"e3"
+							],
+							"maxlen": 3,
+							"type": "bitmap",
+							"typeDefaultValue": 0
+						}
+					},
+					{
+						"abilityId": 101,
+						"accessMode": "rw",
+						"code": "Temp_dif",
+						"description": "",
+						"name": "温差启动",
+						"typeSpec": {
+							"max": 5,
+							"min": 1,
+							"scale": 0,
+							"step": 1,
+							"type": "value",
+							"typeDefaultValue": 1,
+							"unit": "℃"
+						}
+					},
+					{
+						"abilityId": 102,
+						"accessMode": "rw",
+						"code": "program_mode",
+						"description": "",
+						"name": "编程模式",
+						"typeSpec": {
+							"range": [
+								"00",
+								"52",
+								"61",
+								"70"
+							],
+							"type": "enum",
+							"typeDefaultValue": "00"
+						}
+					}
+				]
+			}
+		]
+	}
+}
