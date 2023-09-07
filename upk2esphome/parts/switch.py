@@ -49,6 +49,12 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         }
         invert(switch, rl_inv)
 
+        if led_pin is not None and netled_reuse:
+            yr.warn(
+                f"Skipping LED {i} on pin P{led_pin} - shared status LED is enabled"
+            )
+            led_pin = None
+
         if led_pin is not None:
             yr.log(f" - LED {i}: pin P{led_pin}")
             output = {
