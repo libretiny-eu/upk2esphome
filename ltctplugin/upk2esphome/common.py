@@ -32,4 +32,18 @@ def cloudcutter_get_device(slug: str) -> dict:
                 f"Status code: {r.status_code}"
             )
         device = r.json()
+        for i, profile in enumerate(device["profiles"]):
+            device["profiles"][i] = cloudcutter_get_profile(profile["slug"])
     return device
+
+
+def cloudcutter_get_profile(slug: str) -> dict:
+    url = f"https://tuya-cloudcutter.github.io/api/profiles/{slug}.json"
+    with requests.get(url) as r:
+        if r.status_code != 200:
+            raise RuntimeError(
+                f"Couldn't download Cloudcutter profile '{slug}'.\n"
+                f"Status code: {r.status_code}"
+            )
+        profile = r.json()
+    return profile

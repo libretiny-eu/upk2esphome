@@ -33,7 +33,7 @@ class ConfigData:
     def is_tuya_mcu(self) -> bool:
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                slug = self.profile_slug
+                slug = self.profile_slug or ""
                 return slug.startswith("bk7231") and "common" in slug
             case ConfigData.Type.STORAGE:
                 return "baud_cfg" in self.data or "uart_adapt_params" in self.data
@@ -63,12 +63,21 @@ class ConfigData:
         return self.extras.get("category", {})
 
     @property
-    def profile_slug(self) -> str:
+    def profile(self) -> dict | None:
+        profiles = self.data.get("profiles", [])
+        profile = profiles and profiles[0] or {}
+        if isinstance(profile, dict):
+            return profile
+        return None
+
+    @property
+    def profile_slug(self) -> str | None:
         profiles = self.data.get("profiles", [])
         profile = profiles and profiles[0] or {}
         if isinstance(profile, str):
             return profile.lower()
-        return profile.get("slug", "").lower()
+        slug = profile.get("slug", None)
+        return slug and slug.lower()
 
     @property
     def chip_name(
@@ -83,6 +92,13 @@ class ConfigData:
                     return "BK7231N"
                 case _:
                     return "?"
+        profile = self.profile
+        if profile and "firmware" in profile:
+            chip = profile["firmware"].get("chip", None)
+            if chip == "BK7231T":
+                return "BK7231T"
+            if chip == "BK7231N":
+                return "BK7231N"
         slug = self.profile_slug
         if slug:
             if "bk7231t" in slug:
@@ -100,7 +116,11 @@ class ConfigData:
 
     @property
     def schema_id(self) -> str | None:
-        return self.data.get("gw_di", {}).get("s_id", None)
+        match self.type:
+            case ConfigData.Type.CLOUDCUTTER:
+                return list(self.data.get("schemas", {}) or [None])[0]
+            case ConfigData.Type.STORAGE:
+                return self.data.get("gw_di", {}).get("s_id", None)
 
     @property
     def data_device(self) -> dict | None:
@@ -111,7 +131,7 @@ class ConfigData:
                     firmwareKey=key if key.startswith("key") else None,
                     productKey=key if not key.startswith("key") else None,
                     factoryPin=None,
-                    softwareVer=None,
+                    softwareVer=self.profile.get("firmware", {}).get("version", None),
                 )
             case ConfigData.Type.STORAGE:
                 gw_di = self.data.get("gw_di", {})
