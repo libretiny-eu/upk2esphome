@@ -5,43 +5,70 @@ from upk2esphome.generator import invert
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 
-colors = ["red", "green", "blue", "cold", "warm"]
-platforms = {
+COLORS_STD = ["red", "green", "blue", "cold", "warm"]
+COLORS_ALL = [*COLORS_STD, "brightness", "temperature"]
+EXTRAS_CW = {
+    "cold_white_color_temperature": "6500 K",
+    "warm_white_color_temperature": "2700 K",
+}
+EXTRAS_RGBCW = {
+    "color_interlock": True,
+    **EXTRAS_CW,
+}
+
+# { found_colors: (esphome_platform, {color_translation}, {extra_opts}) }
+COLOR_PLATFORMS = {
+    # Red, Green, Blue
     "rgb": ("rgb", {}, {}),
+    # Red, Green, Blue, Warm
     "rgbw": ("rgbw", {"warm": "white"}, {}),
+    # Red, Green, Blue, Cold
     "rgbc": ("rgbw", {"cold": "white"}, {}),
+    # Red, Green, Blue, Cold, Warm
     "rgbcw": (
         "rgbww",
         {"cold": "cold_white", "warm": "warm_white"},
-        {
-            "color_interlock": True,
-            "cold_white_color_temperature": "6500 K",
-            "warm_white_color_temperature": "2700 K",
-        },
+        EXTRAS_RGBCW,
     ),
+    # Red, Green, Blue, Brightness, Temperature
+    "rgbbt": (
+        "rgbct",
+        {"brightness": "white_brightness", "temperature": "color_temperature"},
+        EXTRAS_RGBCW,
+    ),
+    # Cold, Warm
     "cw": (
         "cwww",
         {"cold": "cold_white", "warm": "warm_white"},
-        {
-            "cold_white_color_temperature": "6500 K",
-            "warm_white_color_temperature": "2700 K",
-        },
+        EXTRAS_CW,
     ),
+    # Brightness, Temperature
+    "bt": (
+        "color_temperature",
+        {"temperature": "color_temperature"},
+        EXTRAS_CW,
+    ),
+    # Cold
     "c": ("monochromatic", {"cold": "output"}, {}),
+    # Warm
     "w": ("monochromatic", {"warm": "output"}, {}),
 }
-cmods = {
-    "rgbcw": "rgbww",
-    "rgb": "rgb",
-    "cw": "cwww",
-    "c": "monochromatic",
-    "rgbc": "rgbw",
+
+# { (cmod, cwtype): esphome_platform }
+CMOD_PLATFORM = {
+    ("rgbcw", 0): "rgbww",
+    ("rgbcw", 1): "rgbct",
+    ("rgb", 0): "rgb",
+    ("cw", 0): "cwww",
+    ("cw", 1): "color_temperature",
+    ("c", 0): "monochromatic",
+    ("rgbc", 0): "rgbw",
 }
 
 
-def get_platform(found: set[str]) -> str | None:
+def get_platform(found: set[str]):
     key = sorted(c[0] for c in found)
-    for name, platform in platforms.items():
+    for name, platform in COLOR_PLATFORMS.items():
         if sorted(name) == key:
             return platform
     return None
@@ -49,11 +76,16 @@ def get_platform(found: set[str]) -> str | None:
 
 def gen_pwm(yr: YamlResult, config: dict) -> set[str]:
     found = set()
-    for color in colors:
+    is_ct = config.get("cwtype", 0) == 1
+    for color in COLORS_STD:
         pin = config.get(f"{color[0]}_pin", None)
         inv = config.get(f"{color[0]}_lv", None) == 0
         if pin is None:
             continue
+        if is_ct and color == "cold":
+            color = "brightness"
+        elif is_ct and color == "warm":
+            color = "temperature"
         found.add(color)
 
         yr.log(f" - color {color}: pin P{pin}, inverted {inv}")
@@ -89,7 +121,7 @@ def gen_i2c_sm2235(yr: YamlResult, config: dict):
         yr.log(f" - white channels power: {cur_white}")
 
     found = set()
-    for color in colors:
+    for color in COLORS_STD:
         channel = f"iic{color[0]}"
         if channel not in config:
             continue
@@ -144,7 +176,7 @@ def gen_i2c_sm2135eh(yr: YamlResult, config: dict):
         yr.log(f" - white channels current: {cur_white} mA")
 
     found = set()
-    for color in colors:
+    for color in COLORS_STD:
         channel = f"iic{color[0]}"
         if channel not in config:
             continue
@@ -178,7 +210,7 @@ def gen_i2c_bp5758d(yr: YamlResult, config: dict):
     cur_warm = config.get("dwcur", None)
 
     found = set()
-    for color in colors:
+    for color in COLORS_STD:
         channel = f"iic{color[0]}"
         if channel not in config:
             continue
@@ -223,7 +255,7 @@ def gen_i2c_bp1658cj(yr: YamlResult, config: dict):
         yr.log(f" - white channels power: {cur_white}")
 
     found = set()
-    for color in colors:
+    for color in COLORS_STD:
         channel = f"iic{color[0]}"
         if channel not in config:
             continue
@@ -279,7 +311,7 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             **opts,
         }
         # add channels
-        for color in colors:
+        for color in COLORS_ALL:
             if color not in found:
                 continue
             key = mapping.get(color, color)
@@ -287,7 +319,10 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         # add light component
         yr.light(light)
         # check cmod matching
-        if "cmod" in config:
-            cmod = config["cmod"]
-            if cmods[cmod] != name:
-                yr.warn(f"Module 'cmod': {cmod} doesn't match platform {name}")
+        cmod = config.get("cmod", None)
+        cwtype = config.get("cwtype", 0)
+        if (cmod, cwtype) in CMOD_PLATFORM:
+            if CMOD_PLATFORM[cmod, cwtype] != name:
+                yr.warn(
+                    f"Module cmod:{cmod}/cwtype:{cwtype} doesn't match platform {name}"
+                )

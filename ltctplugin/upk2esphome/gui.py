@@ -2,7 +2,7 @@
 
 import json
 import os
-from logging import debug, error, info, warning
+from logging import debug, error, exception, info, warning
 from os.path import dirname, isfile
 
 import wx
@@ -11,7 +11,6 @@ import wx.xrc
 from ltchiptool.gui.base.zc import ZeroconfBase
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event
-from ltchiptool.util.logging import LoggingHandler
 from zeroconf import IPVersion, ServiceInfo
 
 from upk2esphome import Opts, YamlResult, upk2esphome
@@ -356,7 +355,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.EnableAll()
         except Exception as e:
             self.EnableAll()
-            LoggingHandler.get().emit_exception(e)
+            exception(None, exc_info=e)
             return
 
         dialog = wx.SingleChoiceDialog(
@@ -377,7 +376,7 @@ class UpkPanel(BasePanel, ZeroconfBase):
             self.EnableAll()
         except Exception as e:
             self.EnableAll()
-            LoggingHandler.get().emit_exception(e)
+            exception(None, exc_info=e)
             return
 
         self.data = device
