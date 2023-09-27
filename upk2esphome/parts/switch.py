@@ -58,7 +58,7 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         if led_pin is not None:
             yr.log(f" - LED {i}: pin P{led_pin}")
             output = {
-                "platform": "ledc",
+                "platform": "libretiny_pwm",
                 "id": f"output_led_{i}",
                 "pin": f"P{led_pin}",
             }
