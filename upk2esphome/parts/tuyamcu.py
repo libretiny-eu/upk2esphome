@@ -49,8 +49,6 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             f"Downloaded schema ID ({model_id}) "
             f"doesn't match device schema ID ({schema_id})"
         )
-        yr.needs_tuyamcu_model = True
-        return
 
     yr.data["tuya"] = {
         "_1": f"DPIDs processed from schema model: {model_id}",
