@@ -25,6 +25,9 @@
 
 <div class="container">
     <h1 class="text-body-emphasis">UPK2ESPHome</h1>
+    <p>
+        <a class="text-body-secondary" href="https://github.com/libretiny-eu/upk2esphome">See on GitHub</a>
+    </p>
     <p class="fs-5 col-md-8">
         This website allows you to generate ESPHome YAML Configuration based on <code>user_param_key</code>
         parameters, used in many Tuya smart devices.
@@ -39,13 +42,15 @@
         <li>raw data (JSON-like) extracted from storage, or offset 0x1E5000/0x1D4000 of the flash memory</li>
     </ul>
     <p>Supported device features are: relays, buttons, LEDs (status, PWM, driver chips), power monitoring chips.</p>
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-dismissible alert-warning fade show" role="alert" id="disclaimer">
         <p>While the author has taken care to write the converter as well as possible, keep in mind that this might not
             be 100% accurate!</p>
         <p>There may be some errors, such as missing components (unsupported types) or incorrect readings.</p>
         <p>This serves mostly as a kickstart config, rather than a production-ready file. Make sure to review the output
             before uploading it to the device.</p>
         <p><b>We do not take responsibility for using this tool and the generated configs.</b></p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                id="close-disclaimer"></button>
     </div>
     <div class="alert alert-info" role="alert">
         <p><b>
@@ -125,17 +130,32 @@
         </div>
         <div class="col-sm-12" id="logs"></div>
         <footer class="py-3 my-4 border-top">
-            <p class="col-md-4 mb-0 text-body-secondary mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                &copy; 2023 kuba2k2 &amp;
-                <a class="text-body-secondary" href="https://github.com/kuba2k2/libretiny">the LibreTiny project</a>
+            <p class="col-sm-12 mb-0 text-body-secondary mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                &copy; 2023 kuba2k2,
+                <a class="text-body-secondary" href="https://github.com/libretiny-eu/libretiny">
+                    the LibreTiny project
+                </a>
+                &amp;
+                <a class="text-body-secondary" href="https://github.com/tuya-cloudcutter/tuya-cloudcutter">
+                    the tuya-cloudcutter project
+                </a>
                 &bull;
-                <a class="text-body-secondary" href="https://github.com/libretiny-eu/upk2esphome">View on GitHub</a>
+                <img src="ko-fi.png" style="height: 24px;" alt="Ko-Fi Logo">
+                <a class="text-body-secondary" href="https://ko-fi.com/kuba2k2">Support me on Ko-fi</a>
             </p>
         </footer>
     </div>
 </div>
 
 <script>
+    $("#close-disclaimer").on("click", function () {
+        localStorage.setItem("disclaimerClosed", "true");
+    });
+
+    if (localStorage.getItem("disclaimerClosed") === "true") {
+        $("#disclaimer").hide();
+    }
+
     function setProfileFromUrl(noHistory = false) {
         const query = new URLSearchParams(location.search);
         const profile = query.get('profile');
