@@ -85,7 +85,7 @@ class ConfigData:
     ) -> Literal["BK7231T"] | Literal["BK7231N"] | Literal["?"] | None:
         module = self.upk.get("module", "")
         if module:
-            match module[0:2]:
+            match module[0:2].upper():
                 case "WB":
                     return "BK7231T"
                 case "CB":
