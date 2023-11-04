@@ -145,13 +145,6 @@ def gen_i2c_sm2135eh(yr: YamlResult, config: dict):
         yr.warn("I2C pins not found")
         return None
 
-    yr.component(
-        {
-            "source": "github://pr#3850",
-            "components": ["sm2135"],
-            "refresh": "10 min",
-        }
-    )
     yr.data["sm2135"] = {
         "clock_pin": f"P{scl}",
         "data_pin": f"P{sda}",
