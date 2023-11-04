@@ -440,11 +440,21 @@ class UpkPanel(BasePanel, ZeroconfBase):
         if not self.schema_response:
             self.ButtonSchemaResponse.Enable(False)
             return
-        wx.MessageBox(
-            message=json.dumps(self.schema_response, indent=4),
+        message = json.dumps(self.schema_response, indent=4)
+        dialog = wx.RichMessageDialog(
+            parent=self,
+            message=message,
             caption="Schema API response",
-            style=wx.ICON_INFORMATION,
         )
+        dialog.ShowCheckBox("Copy to clipboard", checked=False)
+        dialog.ShowModal()
+        if dialog.IsCheckBoxChecked():
+            clip = wx.TextDataObject()
+            clip.SetText(message)
+            if wx.TheClipboard.Open():
+                wx.TheClipboard.SetData(clip)
+                wx.TheClipboard.Flush()
+        dialog.Destroy()
 
     @on_event
     def OnSchemaCollapsibleClick(self):
