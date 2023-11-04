@@ -50,7 +50,7 @@ class UpkThread(BaseThread):
         start = 0x1E0000 - offset
         end = 0x200000 - offset
         init_size = 1024
-        block_size = 4096
+        block_size = 2048
         buffer = bytearray(end - start)
 
         with ClickProgressCallback(length=end - start) as bar:
@@ -66,7 +66,7 @@ class UpkThread(BaseThread):
             params = dict(offset=0, length=init_size)
 
             bar.on_message(f"Connecting to {ip}...")
-            with requests.get(url, params) as r:
+            with requests.get(url, params, timeout=5.0) as r:
                 data = r.content
                 if len(data) != init_size:
                     self.on_error(
@@ -81,7 +81,7 @@ class UpkThread(BaseThread):
                 params["offset"] = offset + start
                 params["length"] = read_size
                 sleep(0.05)
-                with requests.get(url, params) as r:
+                with requests.get(url, params, timeout=5.0) as r:
                     data = r.content
                     if len(data) != read_size:
                         warning(f"Incomplete response read: {len(data)}/{read_size}")
