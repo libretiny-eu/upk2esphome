@@ -139,7 +139,7 @@ class ConfigData:
                 pk = gw_di.get("pk", None)
                 return dict(
                     firmwareKey=gw_di.get("firmk", None),
-                    productKey=pk if not pk.startswith("key") else None,
+                    productKey=pk if pk and not pk.startswith("key") else None,
                     factoryPin=gw_bi.get("fac_pin", None),
                     softwareVer=gw_di.get("swv", None),
                 )
