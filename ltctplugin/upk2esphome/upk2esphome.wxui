@@ -5,7 +5,8 @@
     class="Project">
     <node
       class="PanelForm"
-      class_name="UpkPanel">
+      class_name="UpkPanel"
+      mockup_size="400,200">
       <node
         class="wxBoxSizer"
         var_name="sizer_upk_main">
@@ -240,57 +241,70 @@
             background_colour="wxSYS_COLOUR_BTNFACE"
             window_style="wxTAB_TRAVERSAL">
             <node
-              class="wxGridSizer"
-              rows="1">
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="box_sizer_13"
+              borders=""
+              flags="wxEXPAND">
               <node
                 class="wxBoxSizer"
-                orientation="wxVERTICAL"
-                var_name="sizer_source_data"
+                var_name="box_sizer_14"
                 borders=""
                 flags="wxEXPAND"
                 proportion="1">
                 <node
-                  class="wxStaticText"
-                  label="This page shows the extracted Storage Area JSON.&#10;It contains a device schema and some other information&#10;that are useful for building Cloudcutter profiles.&#10;If Cloudcutter doesn't support your device yet,&#10;consider submitting the JSON to the issues page:"
-                  markup="1"
-                  style="wxST_ELLIPSIZE_END"
-                  var_name="text_source_data"
-                  wrap="400"
-                  flags="wxEXPAND" />
-                <node
-                  class="wxHyperlinkCtrl"
-                  label="https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues"
-                  var_name="link_source_data" />
-                <node
-                  class="wxTextCtrl"
-                  style="wxTE_MULTILINE|wxTE_READONLY"
-                  var_name="input_source_data"
-                  font="Consolas,11"
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="sizer_source_data"
+                  borders=""
                   flags="wxEXPAND"
-                  proportion="1" />
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Storage data JSON:"
+                    markup="1"
+                    var_name="text_source_data_2" />
+                  <node
+                    class="wxTextCtrl"
+                    style="wxTE_MULTILINE|wxTE_READONLY"
+                    var_name="input_source_data"
+                    font="Consolas,11"
+                    flags="wxEXPAND"
+                    proportion="1" />
+                </node>
+                <node
+                  class="wxBoxSizer"
+                  orientation="wxVERTICAL"
+                  var_name="sizer_source_extras"
+                  borders=""
+                  flags="wxEXPAND"
+                  proportion="1">
+                  <node
+                    class="wxStaticText"
+                    label="Additional data passed to UPK2ESPHome:"
+                    markup="1"
+                    var_name="text_source_extras" />
+                  <node
+                    class="wxTextCtrl"
+                    style="wxTE_MULTILINE|wxTE_READONLY"
+                    var_name="input_source_extras"
+                    font="Consolas,11"
+                    flags="wxEXPAND"
+                    proportion="1" />
+                </node>
               </node>
               <node
-                class="wxBoxSizer"
-                orientation="wxVERTICAL"
-                var_name="sizer_source_extras"
-                borders=""
-                flags="wxEXPAND"
-                proportion="1">
-                <node
-                  class="wxStaticText"
-                  label="Additional data passed to UPK2ESPHome:"
-                  markup="1"
-                  var_name="text_source_extras"
-                  wrap="400"
-                  flags="wxEXPAND" />
-                <node
-                  class="wxTextCtrl"
-                  style="wxTE_MULTILINE|wxTE_READONLY"
-                  var_name="input_source_extras"
-                  font="Consolas,11"
-                  flags="wxEXPAND"
-                  proportion="1" />
-              </node>
+                class="wxStaticText"
+                label="This page shows the extracted Storage Area JSON.&#10;It contains a device schema and some other information that are useful for building Cloudcutter profiles.&#10;If Cloudcutter doesn't support your device yet, consider submitting the JSON to the issues page:"
+                markup="1"
+                style="wxST_ELLIPSIZE_END"
+                var_name="text_source_data"
+                wrap="0"
+                flags="wxEXPAND" />
+              <node
+                class="wxHyperlinkCtrl"
+                label="https://github.com/tuya-cloudcutter/tuya-cloudcutter/issues"
+                var_name="link_source_data" />
             </node>
           </node>
           <node
@@ -298,7 +312,7 @@
             label="Schema Download"
             var_name="page_schema"
             background_colour="wxSYS_COLOUR_BTNFACE"
-            window_style="wxTAB_TRAVERSAL|wxVSCROLL">
+            window_style="wxTAB_TRAVERSAL">
             <node
               class="wxBoxSizer"
               orientation="wxVERTICAL"
@@ -306,11 +320,13 @@
               flags="wxEXPAND">
               <node
                 class="wxStaticText"
-                label="This page allows to download device schema model descriptions from the Tuya Cloud API.&#10;&#10;Having the schema model allows UPK2ESPHome to generate YAML with appropriate datapoints (DPIDs) for TuyaMCU." />
+                label="This page allows to download device schema model descriptions from the Tuya Cloud API.&#10;&#10;Having the schema model allows UPK2ESPHome to generate YAML with appropriate datapoints (DPIDs) for TuyaMCU."
+                wrap="0" />
               <node
                 class="wxStaticText"
                 label="All necessary parameters have been filled out for you, based on the device configuration you chose."
                 var_name="text_guided_1"
+                wrap="0"
                 font="normal size,italic" />
               <node
                 class="wxStaticText"
