@@ -106,7 +106,6 @@ def kickstart(url: str, output: click.File, **kwargs):
     work = UpkThread(
         url=url,
         on_storage=lambda data: write_upk(data, output, **kwargs),
-        on_error=error,
     )
     work.start()
 
@@ -155,7 +154,6 @@ def firmware(file: click.File, output: click.File, **kwargs):
     work = UpkThread(
         file=file.name,
         on_storage=lambda data: write_upk(data, output, **kwargs),
-        on_error=error,
     )
     work.start()
 

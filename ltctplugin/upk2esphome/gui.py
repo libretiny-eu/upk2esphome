@@ -232,15 +232,6 @@ class UpkPanel(BasePanel, ZeroconfBase):
         self.data = storage
         self.DoUpdate()
 
-    def OnStorageError(self, error_text: str):
-        self.data = None
-        self.DoUpdate()
-        wx.MessageBox(
-            message=error_text,
-            caption="Error",
-            style=wx.ICON_ERROR,
-        )
-
     def OnSchemaResponse(self, response: dict):
         self.schema_response = response
         self.DoUpdate()
@@ -261,10 +252,10 @@ class UpkPanel(BasePanel, ZeroconfBase):
         if not isfile(file):
             return
         self.last_dir = dirname(file)
+        self.data = None
         work = UpkThread(
             file=file,
             on_storage=self.OnStorageData,
-            on_error=self.OnStorageError,
         )
         self.StartWork(work)
 
@@ -340,10 +331,10 @@ class UpkPanel(BasePanel, ZeroconfBase):
 
         debug(f"Kickstart URL: {url}")
         self.last_url = url
+        self.data = None
         work = UpkThread(
             url=url,
             on_storage=self.OnStorageData,
-            on_error=self.OnStorageError,
         )
         self.StartWork(work)
 
@@ -392,10 +383,10 @@ class UpkPanel(BasePanel, ZeroconfBase):
                 return
             file = dialog.GetPath()
             self.last_dir = dirname(file)
+            self.data = None
             work = UpkThread(
                 file=file,
                 on_storage=self.OnStorageData,
-                on_error=self.OnStorageError,
             )
             self.StartWork(work)
 
@@ -431,7 +422,6 @@ class UpkPanel(BasePanel, ZeroconfBase):
                 and self.last_result.config.schema_id
             ),
             on_success=self.OnSchemaResponse,
-            on_error=self.OnSchemaError,
         )
         self.StartWork(work)
 

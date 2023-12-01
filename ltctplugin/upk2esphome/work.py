@@ -1,6 +1,6 @@
 #  Copyright (c) Kuba Szczodrzyński 2023-5-13.
 
-from logging import debug, error, warning
+from logging import debug, warning
 from os import stat
 from os.path import isfile
 from pprint import pprint
@@ -13,7 +13,6 @@ import requests
 from bk7231tools.analysis.kvstorage import KVStorage
 from ltchiptool.gui.work.base import BaseThread
 from ltchiptool.util.flash import ClickProgressCallback
-from ltchiptool.util.logging import LoggingHandler
 
 
 class UpkThread(BaseThread):
@@ -22,13 +21,11 @@ class UpkThread(BaseThread):
         file: str = None,
         url: str = None,
         on_storage: Callable[[dict], None] = None,
-        on_error: Callable[[str], None] = None,
     ):
         super().__init__()
         self.file = file
         self.url = url
         self.on_storage = on_storage
-        self.on_error = on_error
 
     def run_impl(self):
         if self.file is not None:
@@ -44,8 +41,7 @@ class UpkThread(BaseThread):
         url = urlparse(url)
         url = url.netloc
         if not url:
-            self.on_error(f"Invalid URL: {url}")
-            return
+            raise ValueError(f"Invalid URL: {url}")
 
         offset = 0x1E0000
         start = 0x1E0000 - offset
@@ -58,10 +54,8 @@ class UpkThread(BaseThread):
             bar.on_message(f"Resolving {url}...")
             try:
                 ip = gethostbyname(url)
-            except Exception as e:
-                LoggingHandler.get().emit_exception(e, no_hook=True)
-                self.on_error(f"Couldn't find hostname: {url}")
-                return
+            except Exception:
+                raise ConnectionError(f"Couldn't find hostname: {url}")
 
             url = f"http://{ip}/hub/flash_read"
             params = dict(offset=0, length=init_size)
@@ -70,11 +64,10 @@ class UpkThread(BaseThread):
             with requests.get(url, params, timeout=5.0) as r:
                 data = r.content
                 if len(data) != init_size:
-                    self.on_error(
+                    raise RuntimeError(
                         f"Incomplete response read: {len(data)}/{init_size}\n\n"
                         f"Is the chip running Kickstart firmware?"
                     )
-                    return
 
             while start < end and self.should_run():
                 bar.on_message(f"Reading from 0x{offset + start:06X}")
@@ -100,13 +93,11 @@ class UpkThread(BaseThread):
     def run_file(self, file: str):
         # read storage from file
         if not isfile(file):
-            self.on_error("File not found")
-            return
+            raise FileNotFoundError(f"File '{file}' not found")
         size = stat(file).st_size
         if size > 0x400000:
             # file too large
-            self.on_error("File larger than 4 MiB, refusing to load!")
-            return
+            raise RuntimeError(f"File larger than 4 MiB ({size}), refusing to load!")
         if size == 0x200000:
             # probably full flash dump
             with open(file, "rb") as f:
@@ -124,31 +115,33 @@ class UpkThread(BaseThread):
         # parse raw storage
         result = KVStorage.find_storage(data)
         if not result:
-            self.on_error("File doesn't contain known storage area")
-            return
+            raise ValueError("File doesn't contain known storage area")
 
         _, data = result
         try:
             kvs = KVStorage.decrypt_and_unpack(data)
-        except Exception as e:
-            self.on_error("Couldn't parse storage data - see program logs")
-            error("Storage keys failed", exc_info=e)
-            return
+        except Exception:
+            raise RuntimeError("Couldn't unpack storage data - see program logs")
 
         keys = list(kvs.indexes.keys())
         debug(f"Found {len(keys)} keys! {keys}")
         if not keys:
-            self.on_error("No keys found in storage! Is the data corrupt?")
-            pprint(kvs)
-            return
+            # noinspection PyBroadException
+            try:
+                pprint(kvs)
+            except Exception:
+                pass
+            raise RuntimeError("No keys found in storage! Is the data corrupt?")
 
         try:
             storage = kvs.read_all_values_parsed()
-        except Exception as e:
-            self.on_error("Couldn't extract storage data - see program logs")
-            error("Storage values failed", exc_info=e)
-            pprint(kvs)
-            return
+        except Exception:
+            # noinspection PyBroadException
+            try:
+                pprint(kvs)
+            except Exception:
+                pass
+            raise RuntimeError("Couldn't parse storage data - see program logs")
 
         self.on_storage(storage)
 

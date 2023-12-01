@@ -20,7 +20,6 @@ class UpkSchemaThread(BaseThread):
         license_: dict | None,
         schema_id: str | None,
         on_success: Callable[[dict], None] = None,
-        on_error: Callable[[str], None] = None,
     ):
         super().__init__()
         self.device = device or {}
@@ -28,7 +27,6 @@ class UpkSchemaThread(BaseThread):
         self.license = license_ or {}
         self.schema_id = schema_id
         self.on_success = on_success
-        self.on_error = on_error
 
     def run_impl(self):
         auth = (SCHEMA_PULL_USER, SCHEMA_PULL_PASS)
@@ -48,14 +46,11 @@ class UpkSchemaThread(BaseThread):
             and not self.device.get("productKey", None)
             and not self.device.get("factoryPin", None)
         ):
-            self.on_error("Missing FK/PK/FC")
-            return
+            raise ValueError("Missing FK/PK/FC")
         if self.license.get("uuid", None) and not self.license.get("authKey", None):
-            self.on_error("Missing License Auth Key")
-            return
+            raise ValueError("Missing License Auth Key")
         if not self.license.get("uuid", None) and self.license.get("authKey", None):
-            self.on_error("Missing License UUID")
-            return
+            raise ValueError("Missing License UUID")
 
         data = dict(
             device=self.device,
@@ -64,8 +59,7 @@ class UpkSchemaThread(BaseThread):
         )
         with requests.post(url=SCHEMA_PULL_URL, json=data, auth=auth) as r:
             if r.status_code != 200:
-                self.on_error(
+                raise RuntimeError(
                     r.json().get("message", f"Response status code {r.status_code}"),
                 )
-                return
             self.on_success(r.json())
