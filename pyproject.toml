@@ -15,7 +15,7 @@ python = "^3.10"
 PyYAML = "^6.0"
 inquirer = "^3.1.3"
 requests = "^2.31.0"
-bk7231tools = {version = "^1.5.0", extras = ["cli"]}
+bk7231tools = {version = "^1.5.2", extras = ["cli"]}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
