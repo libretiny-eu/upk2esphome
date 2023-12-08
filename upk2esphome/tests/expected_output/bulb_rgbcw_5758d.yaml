@@ -1,0 +1,38 @@
+bp5758d:
+  clock_pin: P24
+  data_pin: P26
+
+output:
+  - platform: bp5758d
+    id: output_red
+    channel: 2
+    current: 14
+  - platform: bp5758d
+    id: output_green
+    channel: 1
+    current: 14
+  - platform: bp5758d
+    id: output_blue
+    channel: 3
+    current: 14
+  - platform: bp5758d
+    id: output_cold
+    channel: 5
+    current: 26
+  - platform: bp5758d
+    id: output_warm
+    channel: 4
+    current: 26
+
+light:
+  - platform: rgbww
+    id: light_rgbww
+    name: Light
+    color_interlock: true
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    red: output_red
+    green: output_green
+    blue: output_blue
+    cold_white: output_cold
+    warm_white: output_warm

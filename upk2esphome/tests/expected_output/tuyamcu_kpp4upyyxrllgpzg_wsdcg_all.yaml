@@ -1,0 +1,203 @@
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: 115200
+
+tuya:
+  # DPIDs processed from schema model: ew4h7s
+  on_datapoint_update:
+    - sensor_datapoint: 3
+      datapoint_type: enum
+      then:
+        - text_sensor.template.publish:
+            id: tuya_battery_state
+            state: !lambda "return std::to_string(x);"
+    - sensor_datapoint: 14
+      datapoint_type: enum
+      then:
+        - text_sensor.template.publish:
+            id: tuya_temp_alarm
+            state: !lambda "return std::to_string(x);"
+    - sensor_datapoint: 15
+      datapoint_type: enum
+      then:
+        - text_sensor.template.publish:
+            id: tuya_hum_alarm
+            state: !lambda "return std::to_string(x);"
+
+sensor:
+  - platform: tuya
+    sensor_datapoint: 1
+    name: Temperature
+    device_class: temperature
+    unit_of_measurement: "\xB0C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: tuya
+    sensor_datapoint: 2
+    name: Humidity
+    device_class: humidity
+    unit_of_measurement: "%"
+  - platform: tuya
+    sensor_datapoint: 4
+    name: Battery Level
+    device_class: battery
+    unit_of_measurement: "%"
+  - platform: tuya
+    sensor_datapoint: 16
+    name: Luminance
+    device_class: illuminance
+    unit_of_measurement: lx
+
+text_sensor:
+  - platform: template
+    id: tuya_battery_state
+    name: Battery Level
+    filters:
+      - map:
+          - 0 -> Low
+          - 1 -> Medium
+          - 2 -> High
+  - platform: template
+    id: tuya_temp_alarm
+    name: (Unconfirmed) Temp Alarm
+    filters:
+      - map:
+          - 0 -> Loweralarm
+          - 1 -> Upperalarm
+          - 2 -> Cancel
+  - platform: template
+    id: tuya_hum_alarm
+    name: (Unconfirmed) Hum Alarm
+    filters:
+      - map:
+          - 0 -> Loweralarm
+          - 1 -> Upperalarm
+          - 2 -> Cancel
+
+binary_sensor:
+  - platform: tuya
+    sensor_datapoint: 5
+    name: Tamper Alarm
+  - platform: tuya
+    sensor_datapoint: 8
+    name: (Unconfirmed) Charge State
+
+number:
+  - platform: tuya
+    number_datapoint: 6
+    name: Temperature Sampling Interval
+    entity_category: config
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 3600
+    step: 1
+  - platform: tuya
+    number_datapoint: 7
+    name: Humidity Sampling Interval
+    entity_category: config
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 3600
+    step: 1
+  - platform: tuya
+    number_datapoint: 10
+    name: Temperature Upper Limit
+    entity_category: config
+    device_class: temperature
+    unit_of_measurement: "\xB0C"
+    min_value: -200
+    max_value: 600
+    step: 1
+  - platform: tuya
+    number_datapoint: 11
+    name: Temperature Lower Limit
+    entity_category: config
+    device_class: temperature
+    unit_of_measurement: "\xB0C"
+    min_value: -200
+    max_value: 600
+    step: 1
+  - platform: tuya
+    number_datapoint: 12
+    name: Humidity Upper Limit
+    entity_category: config
+    device_class: humidity
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 1
+  - platform: tuya
+    number_datapoint: 13
+    name: Humidity Lower Limit
+    entity_category: config
+    device_class: humidity
+    unit_of_measurement: "%"
+    min_value: 0
+    max_value: 100
+    step: 1
+  - platform: tuya
+    number_datapoint: 17
+    name: (Unconfirmed) Temp Periodic Report
+    unit_of_measurement: min
+    min_value: 1
+    max_value: 60
+    step: 1
+  - platform: tuya
+    number_datapoint: 18
+    name: (Unconfirmed) Hum Periodic Report
+    unit_of_measurement: min
+    min_value: 1
+    max_value: 60
+    step: 1
+  - platform: tuya
+    number_datapoint: 19
+    name: (Unconfirmed) Temp Sensitivity
+    unit_of_measurement: "\xB0C"
+    min_value: 3
+    max_value: 10
+    step: 1
+  - platform: tuya
+    number_datapoint: 20
+    name: (Unconfirmed) Hum Sensitivity
+    unit_of_measurement: "%"
+    min_value: 3
+    max_value: 10
+    step: 1
+  - platform: tuya
+    number_datapoint: 22
+    name: (Unconfirmed) Temp Set
+    unit_of_measurement: "\xB0C"
+    min_value: 50
+    max_value: 350
+    step: 5
+  - platform: tuya
+    number_datapoint: 23
+    name: (Unconfirmed) Temp Calibration
+    unit_of_measurement: "\xB0C"
+    min_value: -20
+    max_value: 20
+    step: 1
+  - platform: tuya
+    number_datapoint: 24
+    name: (Unconfirmed) Hum Calibration
+    unit_of_measurement: "%"
+    min_value: -10
+    max_value: 10
+    step: 1
+
+select:
+  - platform: tuya
+    enum_datapoint: 9
+    name: Unit Conversion
+    entity_category: config
+    optimistic: true
+    options:
+      0: C
+      1: F
+
+switch:
+  - platform: tuya
+    switch_datapoint: 21
+    name: (Unconfirmed) Switch
