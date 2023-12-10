@@ -14,7 +14,7 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
     for key in in_keys:
         ir_pin = config.get(f"{key}")
 
-        # keys current not understood:
+        # keys currently not understood:
         # irfunc
         # irnightt
         # irstep
