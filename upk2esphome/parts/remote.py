@@ -28,8 +28,8 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             "pin": f"P{ir_pin}",
         }
         pull(receiver, True)
+        receiver["_1"] = "dump: all"
         yr.data["remote_receiver"] = receiver
-        yr.data["remote_receiver"]["_1"] = "dump: all"
 
     for key in out_keys:
         ir_pin = config.get(f"{key}")
