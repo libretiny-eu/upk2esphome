@@ -26,10 +26,7 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             continue
 
         yr.log(f"Remote receiver: pin P{ir_pin}")
-        receiver = {
-            "pin": f"P{ir_pin}",
-            "id": f"P{ir_pin}"
-        }
+        receiver = {"pin": f"P{ir_pin}", "id": f"P{ir_pin}"}
         pull(receiver, True)
         receiver["_1"] = "dump: all"
         receivers.append(receiver)
