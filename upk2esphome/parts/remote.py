@@ -8,9 +8,12 @@ from upk2esphome.result import YamlResult
 
 def generate(yr: YamlResult, config: ConfigData, opts: Opts):
     config = config.upk or {}
-    keys = ["ir"]
+    in_keys = ["ir", "infrr"]
+    out_keys = ["infre"]
 
-    for key in keys:
+    receivers = []
+
+    for key in in_keys:
         ir_pin = config.get(f"{key}")
 
         # keys current not understood:
@@ -25,7 +28,11 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         yr.log(f"Remote receiver: pin P{ir_pin}")
         receiver = {
             "pin": f"P{ir_pin}",
+            "id": f"P{ir_pin}"
         }
         pull(receiver, True)
-        yr.data["remote_receiver"] = receiver
-        yr.data["remote_receiver"]["_1"] = "dump: all"
+        receiver["_1"] = "dump: all"
+        receivers.append(receiver)
+
+    if receivers:
+        yr.data["remote_receiver"] = receivers
