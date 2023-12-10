@@ -11,8 +11,6 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
     in_keys = ["ir", "infrr"]
     out_keys = ["infre"]
 
-    receivers = []
-
     for key in in_keys:
         ir_pin = config.get(f"{key}")
 
@@ -26,10 +24,9 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             continue
 
         yr.log(f"Remote receiver: pin P{ir_pin}")
-        receiver = {"pin": f"P{ir_pin}", "id": f"P{ir_pin}"}
+        receiver = {
+            "pin": f"P{ir_pin}",
+        }
         pull(receiver, True)
-        receiver["_1"] = "dump: all"
-        receivers.append(receiver)
-
-    if receivers:
-        yr.data["remote_receiver"] = receivers
+        yr.data["remote_receiver"] = receiver
+        yr.data["remote_receiver"]["_1"] = "dump: all"
