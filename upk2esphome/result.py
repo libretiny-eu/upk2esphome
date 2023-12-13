@@ -37,13 +37,9 @@ class YamlResult:
         text = re.sub(r"\n([a-z])", r"\n\n\1", text)
         text = text.replace("'", '"')
         # generate comments for quoted strings with _\d+ keys
-        text = re.sub(
-            r'_\d+: "(.+?)"', r"# \1", text
-        )
+        text = re.sub(r'_\d+: "(.+?)"', r"# \1", text)
         # generate comments for unquoted strings _\d+ keys
-        text = re.sub(
-            r"_\d+: (.+?)", r"# \1", text
-        )
+        text = re.sub(r"_\d+: (.+?)", r"# \1", text)
         text = text.replace(" {}", "")
         text = text.replace("{}", "")
         return text
