@@ -1,0 +1,69 @@
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: 115200
+
+tuya:
+  # DPIDs processed from schema model: 000004pxun
+
+sensor:
+  - platform: tuya
+    sensor_datapoint: 1
+    name: Total Forward Active Energy
+    device_class: energy
+    state_class: total_increasing
+    unit_of_measurement: kWh
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+  - platform: tuya
+    sensor_datapoint: 13
+    name: Remaining Available Energy Display
+    unit_of_measurement: kWh
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+  - platform: tuya
+    sensor_datapoint: 15
+    name: Leakage Current
+    unit_of_measurement: mA
+
+switch:
+  - platform: tuya
+    switch_datapoint: 11
+    name: Prepayment Function
+  - platform: tuya
+    switch_datapoint: 12
+    name: Clear Energy Data
+    entity_category: config
+  - platform: tuya
+    switch_datapoint: 16
+    name: Circuit Breaker On/Off
+
+number:
+  - platform: tuya
+    number_datapoint: 14
+    name: (Unconfirmed) Charge Energy
+    unit_of_measurement: kWh
+    min_value: 0
+    max_value: 999999
+    step: 1
+  - platform: tuya
+    number_datapoint: 104
+    name: (Unconfirmed) Over Vol Protect Time
+    unit_of_measurement: sec
+    min_value: 1
+    max_value: 30
+    step: 1
+  - platform: tuya
+    number_datapoint: 105
+    name: (Unconfirmed) Over Vol Recovery Time
+    unit_of_measurement: sec
+    min_value: 1
+    max_value: 500
+    step: 1
+
+text_sensor:
+  - platform: tuya
+    sensor_datapoint: 19
+    name: (Unconfirmed) Breaker Id

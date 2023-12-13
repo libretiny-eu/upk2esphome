@@ -1,0 +1,16 @@
+output:
+  - platform: libretiny_pwm
+    id: output_cold
+    pin: P7
+  - platform: libretiny_pwm
+    id: output_warm
+    pin: P6
+
+light:
+  - platform: cwww
+    id: light_cwww
+    name: Light
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    cold_white: output_cold
+    warm_white: output_warm

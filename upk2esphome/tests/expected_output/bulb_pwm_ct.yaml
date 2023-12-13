@@ -1,0 +1,16 @@
+output:
+  - platform: libretiny_pwm
+    id: output_brightness
+    pin: P8
+  - platform: libretiny_pwm
+    id: output_temperature
+    pin: P7
+
+light:
+  - platform: color_temperature
+    id: light_color_temperature
+    name: Light
+    cold_white_color_temperature: 6500 K
+    warm_white_color_temperature: 2700 K
+    brightness: output_brightness
+    color_temperature: output_temperature

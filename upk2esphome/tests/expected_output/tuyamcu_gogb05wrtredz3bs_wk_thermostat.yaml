@@ -1,0 +1,110 @@
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: 115200
+
+tuya:
+  # DPIDs processed from schema model: 00000045od
+  on_datapoint_update:
+    - sensor_datapoint: 36
+      datapoint_type: enum
+      then:
+        - text_sensor.template.publish:
+            id: tuya_valve_state
+            state: !lambda "return std::to_string(x);"
+
+switch:
+  - platform: tuya
+    switch_datapoint: 1
+    name: (Unconfirmed) Switch
+  - platform: tuya
+    switch_datapoint: 10
+    name: (Unconfirmed) Frost
+  - platform: tuya
+    switch_datapoint: 39
+    name: (Unconfirmed) Factory Reset
+  - platform: tuya
+    switch_datapoint: 40
+    name: (Unconfirmed) Child Lock
+
+select:
+  - platform: tuya
+    enum_datapoint: 2
+    name: (Unconfirmed) Mode
+    optimistic: true
+    options:
+      0: Auto
+      1: Manual
+  - platform: tuya
+    enum_datapoint: 43
+    name: (Unconfirmed) Sensor Choose
+    optimistic: true
+    options:
+      0: In
+      1: Out
+      2: All
+  - platform: tuya
+    enum_datapoint: 102
+    name: (Unconfirmed) Program Mode
+    optimistic: true
+    options:
+      0: "00"
+      1: "52"
+      2: "61"
+      3: "70"
+
+number:
+  - platform: tuya
+    number_datapoint: 16
+    name: (Unconfirmed) Temp Set
+    unit_of_measurement: "\xB0C"
+    min_value: 5
+    max_value: 90
+    step: 1
+  - platform: tuya
+    number_datapoint: 19
+    name: (Unconfirmed) Upper Temp
+    unit_of_measurement: "\xB0C"
+    min_value: 30
+    max_value: 90
+    step: 1
+  - platform: tuya
+    number_datapoint: 26
+    name: (Unconfirmed) Lower Temp
+    unit_of_measurement: "\xB0C"
+    min_value: 5
+    max_value: 20
+    step: 1
+  - platform: tuya
+    number_datapoint: 27
+    name: (Unconfirmed) Temp Correction
+    unit_of_measurement: ""
+    min_value: -9
+    max_value: 9
+    step: 1
+  - platform: tuya
+    number_datapoint: 101
+    name: (Unconfirmed) Temp Dif
+    unit_of_measurement: "\xB0C"
+    min_value: 1
+    max_value: 5
+    step: 1
+
+sensor:
+  - platform: tuya
+    sensor_datapoint: 24
+    name: Temperature
+    device_class: temperature
+    unit_of_measurement: "\xB0C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+
+text_sensor:
+  - platform: template
+    id: tuya_valve_state
+    name: (Unconfirmed) Valve State
+    filters:
+      - map:
+          - 0 -> Open
+          - 1 -> Close

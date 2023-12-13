@@ -1,0 +1,43 @@
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: 115200
+
+tuya:
+  # DPIDs processed from schema model: 0000003niz
+
+switch:
+  - platform: tuya
+    switch_datapoint: 1
+    name: (Unconfirmed) Switch
+  - platform: tuya
+    switch_datapoint: 9
+    name: (Unconfirmed) Light
+
+select:
+  - platform: tuya
+    enum_datapoint: 3
+    name: (Unconfirmed) Fan Speed
+    optimistic: true
+    options:
+      0: "1"
+      1: "2"
+      2: "3"
+  - platform: tuya
+    enum_datapoint: 6
+    name: (Unconfirmed) Countdown
+    optimistic: true
+    options:
+      0: "0"
+      1: "1"
+      2: "2"
+      3: "3"
+      4: "4"
+      5: "5"
+      6: "6"
+
+sensor:
+  - platform: tuya
+    sensor_datapoint: 7
+    name: (Unconfirmed) Countdown Left
+    unit_of_measurement: ""

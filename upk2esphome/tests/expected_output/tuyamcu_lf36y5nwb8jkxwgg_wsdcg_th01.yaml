@@ -1,0 +1,49 @@
+uart:
+  rx_pin: RX1
+  tx_pin: TX1
+  baud_rate: REPLACEME
+
+tuya:
+  # DPIDs processed from schema model: 000004ax7p
+  on_datapoint_update:
+    - sensor_datapoint: 3
+      datapoint_type: enum
+      then:
+        - text_sensor.template.publish:
+            id: tuya_battery_state
+            state: !lambda "return std::to_string(x);"
+
+sensor:
+  - platform: tuya
+    sensor_datapoint: 1
+    name: Temperature
+    device_class: temperature
+    unit_of_measurement: "\xB0C"
+    accuracy_decimals: 1
+    filters:
+      - multiply: 0.1
+  - platform: tuya
+    sensor_datapoint: 2
+    name: Humidity
+    device_class: humidity
+    unit_of_measurement: "%"
+
+text_sensor:
+  - platform: template
+    id: tuya_battery_state
+    name: Battery Level
+    filters:
+      - map:
+          - 0 -> Low
+          - 1 -> Medium
+          - 2 -> High
+
+select:
+  - platform: tuya
+    enum_datapoint: 9
+    name: Unit Conversion
+    entity_category: config
+    optimistic: true
+    options:
+      0: C
+      1: F
