@@ -1,5 +1,3 @@
-#  Copyright (c) FIXME Kuba Szczodrzyński 2023-4-21.
-
 from upk2esphome.config import ConfigData
 from upk2esphome.generator import invert, pull
 from upk2esphome.opts import Opts
