@@ -1,0 +1,17 @@
+output:
+  - platform: libretiny_pwm
+    id: output_cold
+    pin: P8
+
+light:
+  - platform: monochromatic
+    id: light_monochromatic
+    name: Light
+    output: output_cold
+
+remote_receiver:
+  pin:
+    number: P7
+    inverted: true
+    mode: INPUT_PULLUP
+  # dump: all

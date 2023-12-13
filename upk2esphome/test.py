@@ -22,8 +22,15 @@ if __name__ == "__main__":
 
     errors = []
 
+    argv = list(sys.argv)
+    if "-w" in argv:
+        write_expected = True
+        argv.remove("-w")
+    else:
+        write_expected = False
+
     for file in glob(join(dirname(__file__), "tests", mask)):
-        if len(sys.argv) == 2 and sys.argv[1] not in file:
+        if len(argv) == 2 and argv[1] not in file:
             continue
         with open(file, "r") as f:
             d = f.read().strip()
@@ -45,9 +52,18 @@ if __name__ == "__main__":
         expected = join(
             dirname(__file__), "tests", "expected_output", basename(file)
         ).replace(".txt", ".yaml")
+        if not isfile(expected):
+            if write_expected:
+                with open(expected, "w") as f:
+                    f.write(yr.text)
+                continue
+            errors.append(
+                f"missing expected output for {basename(file)}, run with -w to write"
+            )
+            continue
         with open(expected, "r") as f:
             expected_yaml = f.read()
-            if expected_yaml != yr.text:
+            if expected_yaml.strip() != yr.text.strip():
                 errors.append(f"content of {expected} was not as expected")
 
     if errors:
