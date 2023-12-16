@@ -56,16 +56,17 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
             led_pin = None
 
         if led_pin is not None:
-            yr.log(f" - LED {i}: pin P{led_pin}")
+            is_pwm = led_pin in (6, 7, 8, 9, 24, 26)  # FIXME: this assumes BK7231
+            yr.log(f" - LED {i}: pin P{led_pin} (is_pwm={is_pwm})")
             output = {
-                "platform": "libretiny_pwm",
+                "platform": "libretiny_pwm" if is_pwm else "gpio",
                 "id": f"output_led_{i}",
                 "pin": f"P{led_pin}",
             }
             invert(output, led_inv)
             yr.output(output)
             light = {
-                "platform": "monochromatic",
+                "platform": "monochromatic" if is_pwm else "binary",
                 "id": f"light_switch_{i}",
                 "output": output["id"],
             }

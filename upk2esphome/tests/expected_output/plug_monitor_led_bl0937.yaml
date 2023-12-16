@@ -1,0 +1,60 @@
+output:
+  - platform: gpio
+    id: output_led_1
+    pin:
+      number: P10
+      inverted: true
+
+light:
+  - platform: binary
+    id: light_switch_1
+    output: output_led_1
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P11
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_1
+
+switch:
+  - platform: gpio
+    id: switch_1
+    name: Relay 1
+    pin: P26
+    on_turn_on:
+      - light.turn_on: light_switch_1
+    on_turn_off:
+      - light.turn_off: light_switch_1
+
+status_led:
+  pin:
+    number: P8
+    inverted: true
+
+sensor:
+  - platform: hlw8012
+    model: BL0937
+    cf_pin:
+      number: P7
+      inverted: true
+    cf1_pin:
+      number: P6
+      inverted: true
+    sel_pin:
+      number: P24
+      inverted: true
+    current:
+      name: BL0937 Current
+    voltage:
+      name: BL0937 Voltage
+    power:
+      name: BL0937 Power
+    energy:
+      name: BL0937 Energy
+    voltage_divider: 1600
+    current_resistor: 0.001 ohm
