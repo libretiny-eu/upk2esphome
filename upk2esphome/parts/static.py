@@ -16,7 +16,7 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         yr.data["api"] = {"password": opts.api_password}
         yr.data["ota"] = {
             "platform": "esphome",
-            "password": opts.ota_password
+            "password": opts.ota_password,
         }
         yr.data["wifi"] = {
             "ssid": opts.wifi_ssid,
