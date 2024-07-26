@@ -14,7 +14,10 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
         yr.data["mdns"] = {}
     if opts.common:
         yr.data["api"] = {"password": opts.api_password}
-        yr.data["ota"] = {"password": opts.ota_password}
+        yr.data["ota"] = {
+            "platform": "esphome",
+            "password": opts.ota_password
+        }
         yr.data["wifi"] = {
             "ssid": opts.wifi_ssid,
             "password": opts.wifi_password,
