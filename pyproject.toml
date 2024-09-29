@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "upk2esphome"
-version = "1.12.0"
+version = "1.13.0"
 description = "Convert Tuya device configuration to ESPHome YAML (ltchiptool plugin)"
 authors = ["Kuba Szczodrzyński <kuba@szczodrzynski.pl>"]
 license = "MIT"
