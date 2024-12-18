@@ -1,5 +1,5 @@
 from upk2esphome.config import ConfigData
-from upk2esphome.generator import invert, pull
+from upk2esphome.generator import pull
 from upk2esphome.opts import Opts
 from upk2esphome.result import YamlResult
 

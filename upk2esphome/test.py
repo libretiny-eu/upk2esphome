@@ -46,7 +46,8 @@ if __name__ == "__main__":
         print("\n".join(f"I: {s}" for s in yr.logs))
         print("\n".join(f"W: {s}" for s in yr.warnings))
         print("\n".join(f"E: {s}" for s in yr.errors))
-        print(yr.text)
+        if len(argv) == 2:
+            print(yr.text)
         print("-" * 80)
 
         expected = join(
@@ -70,3 +71,5 @@ if __name__ == "__main__":
         print("got errors:")
         print("\n".join(errors))
         sys.exit(1)
+    else:
+        print("no errors reported")
