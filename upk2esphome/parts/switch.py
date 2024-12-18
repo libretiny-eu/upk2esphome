@@ -31,23 +31,47 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
     for i in range(0, 10):
         rl_pin = config.get(f"rl{i}_pin", None)
         rl_inv = config.get(f"rl{i}_lv", None) == 0
+        rl_on_pin = config.get(f"rl_on{i}_pin", None)
+        rl_on_inv = config.get(f"rl_on{i}_lv", None) == 0
+        rl_off_pin = config.get(f"rl_off{i}_pin", None)
+        rl_off_inv = config.get(f"rl_off{i}_lv", None) == 0
         led_pin = config.get(f"led{i}_pin", None)
         led_inv = config.get(f"led{i}_lv", None) == 0
         bt_pin = config.get(f"bt{i}_pin", None)
         bt_inv = config.get(f"bt{i}_lv", None) == 0
         onoff_pin = config.get(f"onoff{i}", None)
-        if rl_pin is None:
-            continue
 
-        yr.log(f" - relay {i}: pin P{rl_pin}")
-        yr.found = True
-        switch = {
-            "platform": "gpio",
-            "id": f"switch_{i}",
-            "name": f"Relay {i}",
-            "pin": f"P{rl_pin}",
-        }
-        invert(switch, rl_inv)
+        if rl_pin is not None:
+            yr.log(f" - relay {i}: pin P{rl_pin}")
+            yr.found = True
+            switch = {
+                "platform": "gpio",
+                "id": f"switch_{i}",
+                "name": f"Relay {i}",
+                "pin": f"P{rl_pin}",
+            }
+            invert(switch, rl_inv)
+        elif rl_on_pin is not None and rl_off_pin is not None:
+            yr.log(
+                f" - relay {i} (bistable/H-Bridge): "
+                f"pin ON P{rl_on_pin}, "
+                f"pin OFF P{rl_off_pin}"
+            )
+            yr.found = True
+            pulse_length = config.get(f"rl{i}_drvtime", 100)
+            switch = {
+                "platform": "hbridge",
+                "id": f"switch_{i}",
+                "name": f"Relay {i}",
+                "on_pin": f"P{rl_on_pin}",
+                "off_pin": f"P{rl_off_pin}",
+                "pulse_length": f"{pulse_length}ms",
+                "wait_time": f"{pulse_length // 2}ms",
+            }
+            invert(switch, rl_on_inv, "on_pin")
+            invert(switch, rl_off_inv, "off_pin")
+        else:
+            continue
 
         if led_pin is not None and netled_reuse:
             yr.warn(
@@ -118,6 +142,9 @@ def generate(yr: YamlResult, config: ConfigData, opts: Opts):
 
         switches.append(switch["id"])
         yr.switch(switch)
+
+    if not switches:
+        yr.warn("The switch/plug type is unknown (no relay pin found)")
 
     bt_pin = config.get(f"total_bt_pin", None)
     bt_inv = config.get(f"total_bt_lv", None) == 0
