@@ -20,3 +20,29 @@ light:
     green: output_green
     blue: output_blue
     white: output_cold
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P14
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
+  - platform: gpio
+    id: binary_switch_2
+    pin:
+      number: P8
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
+  - platform: gpio
+    id: binary_switch_3
+    pin:
+      number: P9
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []

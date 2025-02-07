@@ -73,9 +73,9 @@ def upk2esphome(
     opts: Opts,
     raw_extras: Union[str, dict] = None,
 ) -> YamlResult:
-    from .parts import bulb, module, monitor, netled, remote, static, switch, tuyamcu
+    from .parts import bulb, key, module, monitor, netled, remote, static, switch, tuyamcu
 
-    parts = [module, static, bulb, switch, netled, remote, monitor, tuyamcu]
+    parts = [module, static, bulb, switch, netled, remote, monitor, tuyamcu, key]
     yr = YamlResult()
 
     try:
