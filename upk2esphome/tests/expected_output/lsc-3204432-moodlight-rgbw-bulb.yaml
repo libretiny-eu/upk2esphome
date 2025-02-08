@@ -1,0 +1,48 @@
+output:
+  - platform: libretiny_pwm
+    id: output_red
+    pin: P6
+  - platform: libretiny_pwm
+    id: output_green
+    pin: P7
+  - platform: libretiny_pwm
+    id: output_blue
+    pin: P24
+  - platform: libretiny_pwm
+    id: output_cold
+    pin: P26
+
+light:
+  - platform: rgbw
+    id: light_rgbw
+    name: Light
+    red: output_red
+    green: output_green
+    blue: output_blue
+    white: output_cold
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P14
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
+  - platform: gpio
+    id: binary_switch_2
+    pin:
+      number: P8
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
+  - platform: gpio
+    id: binary_switch_3
+    pin:
+      number: P9
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []

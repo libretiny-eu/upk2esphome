@@ -15,3 +15,21 @@ remote_receiver:
     inverted: true
     mode: INPUT_PULLUP
   # dump: all
+
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P14
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
+  - platform: gpio
+    id: binary_switch_2
+    pin:
+      number: P1
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then: []
