@@ -59,6 +59,4 @@ def upk_old2new(upk: dict) -> dict:
         v = VALUE_MAP.get(v, v)
         upk[k] = v
 
-    upk = dict(sorted(upk.items()))
-    print(upk)
-    return upk
+    return dict(sorted(upk.items()))
