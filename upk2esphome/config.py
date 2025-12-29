@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal
 
+from .oldfmt import upk_old2new
+
 
 @dataclass
 class ConfigData:
@@ -22,7 +24,7 @@ class ConfigData:
             type = ConfigData.Type.CLOUDCUTTER
         elif "gw_bi" in data:
             type = ConfigData.Type.STORAGE
-        elif "Jsonver" in data or "jv" in data or "crc" in data:
+        elif "Jsonver" in data or "jv" in data or "crc" in data or "sw" in data:
             type = ConfigData.Type.RAW
             data = dict(sorted(data.items()))
         else:
@@ -42,13 +44,17 @@ class ConfigData:
 
     @property
     def upk(self) -> dict:
+        upk = {}
         match self.type:
             case ConfigData.Type.CLOUDCUTTER:
-                return self.data.get("device_configuration", {})
+                upk = self.data.get("device_configuration", {})
             case ConfigData.Type.STORAGE:
-                return self.data.get("user_param_key", {})
+                upk = self.data.get("user_param_key", {})
             case ConfigData.Type.RAW:
-                return self.data
+                upk = self.data
+        if isinstance(upk.get("sw"), dict):
+            upk = upk_old2new(upk)
+        return upk
 
     @property
     def uart_config(self) -> dict:
