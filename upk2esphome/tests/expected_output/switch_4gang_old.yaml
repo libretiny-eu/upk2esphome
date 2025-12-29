@@ -1,0 +1,60 @@
+binary_sensor:
+  - platform: gpio
+    id: binary_switch_1
+    pin:
+      number: P15
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_1
+  - platform: gpio
+    id: binary_switch_2
+    pin:
+      number: P19
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_2
+  - platform: gpio
+    id: binary_switch_3
+    pin:
+      number: P18
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_3
+  - platform: gpio
+    id: binary_switch_4
+    pin:
+      number: P22
+      inverted: true
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle: switch_4
+
+switch:
+  - platform: gpio
+    id: switch_1
+    name: Relay 1
+    pin: P0
+  - platform: gpio
+    id: switch_2
+    name: Relay 2
+    pin: P14
+  - platform: gpio
+    id: switch_3
+    name: Relay 3
+    pin: P5
+  - platform: gpio
+    id: switch_4
+    name: Relay 4
+    pin: P12
+
+status_led:
+  pin:
+    number: P23
+    inverted: true
