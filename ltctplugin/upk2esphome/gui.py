@@ -8,7 +8,7 @@ from os.path import dirname, isfile
 import wx
 import wx.adv
 import wx.xrc
-from ltchiptool.gui.base.zc import ZeroconfBase
+from ltchiptool.gui.mixin.zc import ZeroconfBase
 from ltchiptool.gui.panels.base import BasePanel
 from ltchiptool.gui.utils import on_event
 from zeroconf import IPVersion, ServiceInfo
